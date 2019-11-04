@@ -1,8 +1,9 @@
 #include "find.h"
+
 // Program to implement KMP Algorithm in C
 int main(void)
 {
-	char* text = "ABAAAAAAACABAABCABAC";
+	char* text = "ABaaaaaaaaaaaaaaaAAAAAAACABAABCABAC";
 	char* pattern = "CAB";
 
 	int n = strlen(text);
