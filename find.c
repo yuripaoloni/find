@@ -19,7 +19,8 @@ int main(int argc,char* argv[]){
 	while(fgets(currentLine, sizeof(currentLine), fInput) != NULL){ //legge tutte le righe del file
 		int n = strlen(currentLine);
 		int m = strlen(word);
-		KMP(currentLine, word, n, m);
+		KMP(currentLine, word, n, m, count);
+		count = count + 1;
 	}
 
 	fclose(fInput);
