@@ -1,8 +1,7 @@
 #include "kmp.h"
 
 // Function to implement KMP algorithm
-void KMP(const char* X, const char* Y, int m, int n)
-{
+void KMP(const char* X, const char* Y, int m, int n){
 	// Base Case 1: Y is NULL or empty
 	if (*Y == '\0' || n == 0)
 		printf("Pattern occurs with shift 0");
