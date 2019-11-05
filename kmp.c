@@ -2,13 +2,14 @@
 
 // Function to implement KMP algorithm
 void KMP(const char* X, const char* Y, int m, int n, int line){
+
 	// Base Case 1: Y is NULL or empty
 	if (*Y == '\0' || n == 0)
 		printf("Pattern occurs with shift 0 at line %d", line);
 
 	// Base Case 2: X is NULL or X's length is less than that of Y's
 	if (*X == '\0' || n > m)
-		printf("Pattern not found at line %d", line);
+		printf("Pattern not found");
 
 	// next[i] stores the index of next best partial match
 	int next[n + 1];
@@ -16,8 +17,7 @@ void KMP(const char* X, const char* Y, int m, int n, int line){
 	for (int i = 0; i < n + 1; i++)
 		next[i] = 0;
 
-	for (int i = 1; i < n; i++)
-	{
+	for (int i = 1; i < n; i++){
 		int j = next[i + 1];
 
 		while (j > 0 && Y[j] != Y[i])
@@ -27,12 +27,11 @@ void KMP(const char* X, const char* Y, int m, int n, int line){
 			next[i + 1] = j + 1;
 	}
 
-	for (int i = 0, j = 0; i < m; i++)
-	{
-		if (*(X + i) == *(Y + j))
-		{
+	for (int i = 0, j = 0; i < m; i++){
+		if (*(X + i) == *(Y + j)){
 			if (++j == n)
 				printf("Pattern occurs with shift %d at line %d\n", i - j + 1, line);
+				//count = count + 1; //conta le occorrenze della parola nella riga in input				
 		}
 		else if (j > 0) {
 			j = next[j];
