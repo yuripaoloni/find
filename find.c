@@ -24,7 +24,7 @@ int main(int argc,char* argv[]){
 		for (i = 0; (i < (sizeof(path)-1) && ((ch = fgetc(fInput)) != EOF) && (ch != '\n')); i++){
 			fPath[k].path[i] = ch;
 		}
-		path[i] = '\0';
+		fPath[k].path[i] = '\0';
 		k = k + 1;
 	}
 
