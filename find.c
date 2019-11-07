@@ -17,12 +17,10 @@ int main(int argc,char* argv[]){
 	struct filePath fPath[2];
 	struct fileWord fWord[1];
 	char currentLine[255]; //conterrà la riga corrente
-	char path[255];
-	char word[30];
     int i, ch;
 	int k = 0;
 
-	if(argc == 1){
+	if(argc == 1){ //stampa le informazioni sul programma
 		printf("Il programma find consente di individuare il numero di occorrenze di un insieme di stringhe all'interno di un gruppo di file.\r\n");
 		printf("Per eseguire il programma utilizzare i seguenti parametri:\r\n");
 		printf(" find --word|-w <inputfile> : per stampare il report alla fine dell'esecuzione\r\n");
@@ -44,7 +42,7 @@ int main(int argc,char* argv[]){
     }
 
 	while(!feof(fInput)){
-		for (i = 0; (i < (sizeof(path)-1) && ((ch = fgetc(fInput)) != EOF) && (ch != '\n')); i++){
+		for (i = 0; (i < (sizeof(fPath[k].path)-1) && ((ch = fgetc(fInput)) != EOF) && (ch != '\n')); i++){
 			fPath[k].path[i] = ch;
 		}
 		fPath[k].path[i] = '\0';
@@ -53,7 +51,8 @@ int main(int argc,char* argv[]){
 
 	fclose(fInput);
 
-	printf("Enter the word to search: ");
+	//per farne inserire di più possiamo chiedere all'utente di dividerla con , o - 
+	printf("Enter the words to search: "); 
 	scanf("%s", fWord[0].word);
 
 	fWord[0].totalOccurences = 0;
