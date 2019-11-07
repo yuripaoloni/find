@@ -12,12 +12,13 @@ int KMP(const char* X, const char* Y, int m, int n, int line, int index){
 	int count = 0;
 
 	// Base Case 1: Y is NULL or empty
-	if (*Y == '\0' || n == 0)
-		printf("Pattern occurs with shift 0 at line %d\r\n", line);
+//	if (*Y == '\0' || n == 0)
+//		printf("Pattern occurs with shift 0 at line %d\r\n", line);
 
 	// Base Case 2: X is NULL or X's length is less than that of Y's
-	if (*X == '\0' || n > m)
-		printf("Pattern not found\r\n");
+//	if (*X == '\0' || n > m)
+//		printf("Pattern not found\r\n");
+
 
 	// next[i] stores the index of next best partial match
 	int next[n + 1];
