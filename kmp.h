@@ -2,8 +2,24 @@
 #include<stdlib.h>
 #include<string.h>
 
-int KMP(const char* X, const char* Y, int m, int n, int line, int index);
+struct filePath{
+    char *path;
+    int fileOccurrences;
+    int position[255][255];
+    struct filePath *next;
+};
 
-void printPosition(int index);
+struct fileWord{
+	char word[50];
+	int totalOccurences;
+	struct filePath *p;
+};	
 
-int getTotalOccurences(int index);
+typedef struct filePath fPath; 
+typedef struct fileWord fWord;
+
+int KMP(const char* X, const char* Y, int m, int n, int line, fPath *app);
+
+void printPosition(fPath *app);
+
+void allocate2dArray(fPath *app, int row, int column);

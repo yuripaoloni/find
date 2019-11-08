@@ -1,24 +1,9 @@
 #include "kmp.h"
 
-struct printOccurences{
-int app[255][255];
-};
-
-struct printOccurences fPrint[2];
-
 // Function to implement KMP algorithm
-int KMP(const char* X, const char* Y, int m, int n, int line, int index){
+int KMP(const char* X, const char* Y, int m, int n, int line, fPath *app){
 
 	int count = 0;
-
-	// Base Case 1: Y is NULL or empty
-//	if (*Y == '\0' || n == 0)
-//		printf("Pattern occurs with shift 0 at line %d\r\n", line);
-
-	// Base Case 2: X is NULL or X's length is less than that of Y's
-//	if (*X == '\0' || n > m)
-//		printf("Pattern not found\r\n");
-
 
 	// next[i] stores the index of next best partial match
 	int next[n + 1];
@@ -41,7 +26,8 @@ int KMP(const char* X, const char* Y, int m, int n, int line, int index){
 			if (++j == n){
 				//printf("Pattern occurs with shift %d at line %d\n", i - j + 1, line);
 				count = count + 1; //conta le occorrenze della parola nella riga in input	
-				fPrint[index].app[line][i - j + 1] = 1;
+				//fPrint[index].app[line][i - j + 1] = 1;
+				app->position[line][i - j + 1] = 1;
 			}
 		}
 		else if (j > 0) {
@@ -53,33 +39,32 @@ int KMP(const char* X, const char* Y, int m, int n, int line, int index){
 	return count;
 }
 
-void printPosition(int index){
+void printPosition(fPath *app){
 
-	int row = sizeof(fPrint[index].app) / sizeof(fPrint[index].app[0]);
-	int column = sizeof(fPrint[index].app[0])/sizeof(fPrint[index].app[0][0]);
+	int row = sizeof(app->position) / sizeof(app->position[0]);
+	int column = sizeof(app->position[0])/sizeof(app->position[0][0]);
 
 	for(int i = 0; i<row; i++){
 		for(int j = 0; j<column; j++){
-			if(fPrint[index].app[i][j] == 1){
+			if(app->position[i][j] == 1){
 				printf("%d %d \r\n", i, j);
 			}
 		}
 	}
-	//memset(fPrint[index].app, 0, sizeof(fPrint[index].app));
 }
 
-int getTotalOccurences(int index){
 
-	int count = 0;
-	int row = sizeof(fPrint[index].app) / sizeof(fPrint[index].app[0]);
-	int column = sizeof(fPrint[index].app[0])/sizeof(fPrint[index].app[0][0]);
+// void allocate2dArray(fPath *app, int row, int column){
 
-	for(int i = 0; i<row; i++){
-		for(int j = 0; j<column; j++){
-			if(fPrint[index].app[i][j] == 1){
-				count++;
-			}
-		}
-	}
-	return count;
-}
+// 	size_t typicalSizeRow = 64;
+// 	size_t typicalSizeColumn = 64;
+
+// 	app->position = (int *)malloc(typicalSizeRow * typicalSizeColumn * sizeof(int));
+
+// 	int rowSize = sizeof(app->position) / sizeof(app->position[0]);
+// 	int columnSize = sizeof(app->position[0])/sizeof(app->position[0][0]);
+
+// 	*(app->position + row*columnSize + column) = 1;
+
+// 	if() //size raggiunta
+// }
