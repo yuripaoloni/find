@@ -29,7 +29,7 @@ int main(int argc, char * argv[]){
 		return 0;
 	}
 
-    fInput = fopen(argv[1], "r");
+    fInput = fopen(argv[2], "r");
 
     if(fInput == NULL){
         fprintf(stderr, "Cannot open %s, exiting. . .\n", argv[2]);
@@ -66,6 +66,7 @@ int main(int argc, char * argv[]){
 
 		int countLine = 0;
 		w->p->fileOccurrences = 0;
+        //w->p->position = NULL;
         endOfLineDetected = 0;
         while(!endOfLineDetected){
             line2 = getLineOfAnySize(fp,128,&endOfLineDetected,&nrOfCharRead);
@@ -75,18 +76,22 @@ int main(int argc, char * argv[]){
 			countLine = countLine + 1;
         }        
         w->totalOccurences = w->totalOccurences + w->p->fileOccurrences;
+        w->p->position = getHead();
         w->p = w->p->next;
         fclose(fp);
     }
     
-    w->p = head;
+    w->p = head; //per rimettere puntatore allinizio
 
     printf("WORD %s \r\n", w->word);
 	printf("TOTAL %d \r\n", w->totalOccurences);
 	while(w->p != NULL){
 		printf("FILE %s \r\n", w->p->path);
 		printf("OCCURENCES %d	\r\n", w->p->fileOccurrences);
-		printPosition(w->p);
+        while (w->p->position != NULL){
+            printf("%d %d\r\n", w->p->position->line, w->p->position->character);
+            w->p->position = w->p->position->next;
+        }
         w->p = w->p->next;
 	}
 	printf("\r\n"); //il file termina con una riga vuota
