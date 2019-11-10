@@ -8,8 +8,11 @@ int main(int argc, char * argv[]){
     char *line2;
     int endOfLineDetected = 0;
     size_t nrOfCharRead = 0;
+    char ch;
 
-    fWord *w = malloc (sizeof(fWord));
+    fWord *w = NULL;
+    fWord *start = NULL;
+    fWord *tail = NULL;
 
     fPath *head = NULL;
     fPath *current = NULL;
@@ -29,18 +32,19 @@ int main(int argc, char * argv[]){
 		return 0;
 	}
 
-    fInput = fopen(argv[2], "r");
+    fInput = fopen(argv[2], "r"); //the file that contains the path of the file in which search.
 
     if(fInput == NULL){
         fprintf(stderr, "Cannot open %s, exiting. . .\n", argv[2]);
     	exit(1);
     }
     
-    while(!endOfLineDetected){
+    while(!endOfLineDetected){ //read line by line the input file in order to save the path in a structure
         line1 = getLineOfAnySize(fInput,128,&endOfLineDetected,&nrOfCharRead);
         fPath *node = malloc (sizeof(fPath));
         node->path = line1;
         node->fileOccurrences = 0;
+        node->position = NULL;
         node->next = NULL;
 
         if(head == NULL){
@@ -51,53 +55,88 @@ int main(int argc, char * argv[]){
     }
 
     fclose(fInput);
-    w->p = head;
-    w->totalOccurences = 0;
 
-    printf("Enter the word to search: ");
-    scanf("%s", w->word);
+    do{
+        fWord *app = malloc(sizeof(fWord));
+        printf("Insert the word to search: ");
+        scanf("%s", app->word);
+        app->totalOccurences = 0;
+        app->p = head;
+        app->next = NULL;
 
-    while(w->p != NULL){
-        fp = fopen(w->p->path, "r"); //apre il file passato come parametro in lettura
-		if(fp == NULL){ //check sull'apertura del file
-			fprintf(stderr, "Cannot open %s, exiting. . .\n", w->p->path);
-			exit(1);
-		}
-
-		int countLine = 0;
-		w->p->fileOccurrences = 0;
-        //w->p->position = NULL;
-        endOfLineDetected = 0;
-        while(!endOfLineDetected){
-            line2 = getLineOfAnySize(fp,128,&endOfLineDetected,&nrOfCharRead);
-            int n = strlen(line2);
-			int m = strlen(w->word);
-			w->p->fileOccurrences = w->p->fileOccurrences + KMP(line2, w->word, n, m, countLine, w->p);
-			countLine = countLine + 1;
-        }        
-        w->totalOccurences = w->totalOccurences + w->p->fileOccurrences;
-        w->p->position = getHead();
-        w->p = w->p->next;
-        fclose(fp);
-    }
-    
-    w->p = head; //per rimettere puntatore allinizio
-
-    printf("WORD %s \r\n", w->word);
-	printf("TOTAL %d \r\n", w->totalOccurences);
-	while(w->p != NULL){
-		printf("FILE %s \r\n", w->p->path);
-		printf("OCCURENCES %d	\r\n", w->p->fileOccurrences);
-        while (w->p->position != NULL){
-            printf("%d %d\r\n", w->p->position->line, w->p->position->character);
-            w->p->position = w->p->position->next;
+        if(start == NULL){
+            tail = start = app;
+        }else{
+            tail = tail->next = app;
         }
-        w->p = w->p->next;
-	}
+        printf("Do you want to insert another word? (Y/N): ");
+        scanf(" %c", &ch);
+    }while(ch == 'y' || ch == 'Y');
+
+    w = start;
+
+    while(w != NULL){
+        while(w->p != NULL){
+            fp = fopen(w->p->path, "r"); //apre il file passato come parametro in lettura
+            if(fp == NULL){ //check sull'apertura del file
+                fprintf(stderr, "Cannot open %s, exiting. . .\n", w->p->path);
+                exit(1);
+            }
+
+            int countLine = 0;
+            w->p->fileOccurrences = 0;
+            endOfLineDetected = 0;
+
+            while(!endOfLineDetected){
+                line2 = getLineOfAnySize(fp,128,&endOfLineDetected,&nrOfCharRead);
+                int n = strlen(line2);
+                int m = strlen(w->word);
+                w->p->fileOccurrences = w->p->fileOccurrences + KMP(line2, w->word, n, m, countLine, w->p);
+                countLine = countLine + 1;
+            }   
+
+            w->totalOccurences = w->totalOccurences + w->p->fileOccurrences; 
+            w->p->position = getHead();
+            w->p = w->p->next;
+            fclose(fp);
+        }
+        w->p = head;
+        printf("WORD %s \r\n", w->word);
+        printf("TOTAL %d \r\n", w->totalOccurences);
+        while(w->p != NULL){
+            printf("FILE %s \r\n", w->p->path);
+            printf("OCCURENCES %d	\r\n", w->p->fileOccurrences);
+            while (w->p->position != NULL){
+                printf("%d %d\r\n", w->p->position->line, w->p->position->character);
+                w->p->position = w->p->position->next;
+            }
+            w->p = w->p->next;
+        }
+        w = w->next;
+    }
+
+    // w = start;
+
+    // while(w != NULL){
+    //     printf("WORD %s \r\n", w->word);
+    //     printf("TOTAL %d \r\n", w->totalOccurences);
+    //     while(w->p != NULL){
+    //         printf("FILE %s \r\n", w->p->path);
+    //         printf("OCCURENCES %d	\r\n", w->p->fileOccurrences);
+    //         while (w->p->position != NULL){
+    //             printf("%d %d\r\n", w->p->position->line, w->p->position->character);
+    //             w->p->position = w->p->position->next;
+    //         }
+    //         w->p = w->p->next;
+    //     }
+    //     w = w->next;
+    // }
+
 	printf("\r\n"); //il file termina con una riga vuota
 
     return 0;
 }
+    
 
 char * getLineOfAnySize(FILE* fp, size_t typicalSize, int *endOfLineDetected,size_t *nrOfCharRead){ 
     char *line;       // buffer for our string
@@ -131,16 +170,18 @@ char * getLineOfAnySize(FILE* fp, size_t typicalSize, int *endOfLineDetected,siz
 
             if (!line) return line; // if we fail to allocate memory we will return NULL
         }
+        if( (len == 0) && *endOfLineDetected){ // empty file
+            *endOfLineDetected = 1;
+            break; 
+        } 
     }
 
-    if( (len == 0) && *endOfLineDetected){ // empty file
-        printf("The file is empty\r\n");
-        return NULL; 
-    } 
 
     line[len++] ='\0';  // ending the string (notice there is no '\n' in the string)
     *nrOfCharRead = len;
 
     return line;       // return the string
 }
+
+
 
