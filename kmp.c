@@ -56,3 +56,4 @@ fPosition * getHead(){ //rimette il puntatore alla testa della lista
 	head = NULL;
 	return app;
 }
+

@@ -9,3 +9,4 @@ char * getLineOfAnySize(FILE* fp, size_t typicalSize, int *endOfLineDetected,siz
 
 
 
+
