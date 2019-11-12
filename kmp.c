@@ -25,7 +25,7 @@ int KMP(const char* X, const char* Y, int m, int n, int line, fPath *app){
 	}
 
 	for (int i = 0, j = 0; i < m; i++){
-		if (*(X + i) == *(Y + j)){
+		if(X[i] == Y[j]){
 			if (++j == n){
 				count = count + 1; //conta le occorrenze della parola nella riga in input	
 				fPosition *node = malloc (sizeof(fPosition));
@@ -40,6 +40,7 @@ int KMP(const char* X, const char* Y, int m, int n, int line, fPath *app){
         		}
 
 				app->position = current;
+
 			}
 		}
 		else if (j > 0) {
@@ -56,4 +57,5 @@ fPosition * getHead(){ //rimette il puntatore alla testa della lista
 	head = NULL;
 	return app;
 }
+
 
