@@ -2,6 +2,10 @@
 #include<stdlib.h>
 #include<string.h>
 
+struct fileList{
+    char *path;
+    struct fileList *next;
+};
 
 struct filePath{
     char *path;
@@ -13,7 +17,7 @@ struct filePath{
 struct fileWord{
 	char word[50];
 	int totalOccurences;
-	struct filePath *p;
+    struct filePath *p;
     struct fileWord *next;
 };
 
@@ -26,6 +30,7 @@ struct OccurrencesPosition{
 typedef struct filePath fPath; 
 typedef struct fileWord fWord;
 typedef struct OccurrencesPosition fPosition;
+typedef struct fileList fList;
 
 fPosition * getHead();
 
