@@ -72,7 +72,8 @@ int main(int argc, char * argv[]){
         }
     }
 
-
+    freeMemory();
+    freeKMP();
 
     return 0;
 }
@@ -288,7 +289,6 @@ void writeFile(fWord *w, fWord *wordHead, char * outputFile){
     printf("\n");
 }
 
-
 void executeVerbose(char *inputFile){
 
     clock_t t;
@@ -388,6 +388,47 @@ void executeVerbose(char *inputFile){
         w = w->next;
         pathHead = NULL;
     }
+}
+
+void freeMemory(){
+
+    list = listHead;
+    fList *tempL = NULL;
+    while(list != NULL){
+        tempL = list;
+        list = list->next;
+        free(tempL);
+    }
+
+    w = wordHead;
+    fWord *tempW = NULL;
+    fPath *tempP = NULL;
+    fPosition *tempO = NULL;
+    while(w != NULL){
+        while(w->p != NULL){
+            while(w->p->position != NULL){
+                tempO = w->p->position;
+                w->p->position = w->p->position->next;
+                free(tempO);
+            }
+            tempP = w->p;
+            w->p = w->p->next;
+            free(tempP);
+        }
+        tempW = w;
+        w = w->next;
+        free(tempW);
+    }
+
+    free(line1);
+    free(line2);
+    free(wordHead);
+    free(wordTail);
+    free(listHead);
+    free(listTail);
+    free(pathHead);
+    free(pathTail);
+    free(positionHead);
 }
 
 

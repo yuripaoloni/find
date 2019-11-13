@@ -13,6 +13,8 @@ void print(fWord *w, fWord *wordHead);
 
 void getFileOccurrences(char *reportFile);
 
+void freeMemory();
+
 
 
 

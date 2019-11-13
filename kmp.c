@@ -58,4 +58,9 @@ fPosition * getHead(){ //rimette il puntatore alla testa della lista
 	return app;
 }
 
+void freeKMP(){
+	free(head);
+	free(current);
+}
+
 
