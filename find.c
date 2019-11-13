@@ -38,7 +38,9 @@ int main(int argc, char * argv[]){
 		return 0;
 	}
 
-     //find --words|-w <inputfile> 
+    //sistemare selezione parametri
+
+    //find --words|-w <inputfile>
     if(argc == 3 && ((strcmp(argv[1], "--words") == 0) || (strcmp(argv[1], "-w") == 0))){
         execute(argv[2], NULL);
         print(w, wordHead);
@@ -46,31 +48,39 @@ int main(int argc, char * argv[]){
         for(int i = 3; i<argc; i++){
             if((strcmp(argv[i], "--output") == 0) || (strcmp(argv[i], "-o") == 0)){
                 execute(argv[2], NULL);
-                //bisogna anche stampare su console???
+                printf("w, wordHead");
                 writeFile(w, wordHead, argv[i+1]);
+                i++;
             }
             if((strcmp(argv[i], "--exclude") == 0) || (strcmp(argv[i], "-e") == 0)){
                 execute(argv[2], argv[i+1]);
                 print(w, wordHead);
+                i++;
             }
             if((strcmp(argv[i], "--verbose") == 0) || (strcmp(argv[i], "-v") == 0)){
-                executeVerbose(argv[2]);
+                executeVerbose(argv[2], NULL);
                 print(w,wordHead);
             }
         }
-
     }
 
     //operazioni da effettuare sul file di report
     if(((strcmp(argv[1], "--report") == 0) || (strcmp(argv[1], "-r") == 0)) && (strcmp(argv[3], "--show") == 0)){
-        if(strcmp(argv[5], "--file") == 0){
-            
-        }else{ //fine --report|-r <reportfile> --show <word> <n>
-            //Stampare la lista dei file dove occorre almeno <n> volte la parola <word>:
-            printf("asdfgfsadfsdggfa");
-            getFileOccurrences(argv[2]);
-
-        }
+            if(argv[5] != NULL){
+               if(strcmp(argv[5], "--file") == 0){
+                   //fine --report|-r <reportfile> --show <word> --file <file>
+                   //Stampare tutte le posizioni dove la parola <word> occorre nel file <file>:
+                   //Se <word> non occorre in <file>, viene stampato a video un messaggio opportuno.
+                   getWordOccurences(argv[4], argv[2], argv[6]);
+               }else{
+                //find --report|-r <reportfile> --show <word> <n>
+                //Stampare la lista dei file dove occorre almeno <n> volte la parola <word>:
+                getFileList(argv[2], argv[4], atoi(argv[5]));
+               }
+            }else{
+                //Se <n> viene omesso, si utilizza il valore 1.
+               getFileList(argv[2], argv[4], 1);
+            }
     }
 
     freeMemory();
@@ -124,11 +134,66 @@ char * getLineOfAnySize(FILE* fp, size_t typicalSize, int *endOfLineDetected,siz
     return line;       // return the string
 }
 
-void getFileOccurrences(char *reportFile){
+void getWordOccurences(char *word, char *file, char *fileToCheck){
+    FILE *f;
+    char *curr;
+    endOfLineDetected = 0;
+    nrOfCharRead = 0;
+    char *currentWord;
+    char *currentFile;
+    char *p;
+
+    f = fopen(file, "r");
+    if(f == NULL){
+        fprintf(stderr, "Cannot open %s, exiting. . .\n", file);
+    	exit(1);
+    }
+
+
+    while(!endOfLineDetected){
+        curr = getLineOfAnySize(f,128,&endOfLineDetected,&nrOfCharRead);
+        if(curr[0] == 'W'){
+            currentWord = strrchr(curr, ' ');
+            currentWord++;
+            continue;
+        }
+        if(curr[0] == 'F'){
+            currentFile = strrchr(curr, ' ');
+            currentFile++;
+            continue;
+        }
+        if(curr[0] == 'O'){
+            p = strrchr(curr, ' ');
+            p++;
+            continue;
+        }
+        if(strcmp(currentWord, word) == 0){
+            if(strcmp(currentFile, fileToCheck) == 0){
+                if(atoi(p) > 0){
+                    printf("%s\r\n", curr);
+                    continue;
+                }else{
+                    printf("La parola %s non occorre nel file %s\r\n", word, fileToCheck);
+                    break;
+                }
+            }
+                    
+        }
+    }
+    fclose(f);
+    free(currentWord);
+    free(currentFile);
+    free(p);
+}
+
+void getFileList(char *reportFile, char *wordtoCheck, int occurr){
     FILE * report;
     char *line;
     endOfLineDetected = 0;
     nrOfCharRead = 0;
+    char *word;
+    char *file;
+    char *p;
 
     report = fopen(reportFile, "r");
     if(report == NULL){
@@ -138,10 +203,30 @@ void getFileOccurrences(char *reportFile){
 
     while(!endOfLineDetected){
         line = getLineOfAnySize(report,128,&endOfLineDetected,&nrOfCharRead);
-        printf("%s\r\n", line);
+        if(line[0] == 'W'){
+            word = strrchr(line, ' ');
+            word++;  
+            continue;
+        }
+        if(line[0] == 'F'){
+            file = strrchr(line, ' ');
+            file++;
+            continue;
+        }
+        if(line[0] == 'O'){
+            p = strrchr(line, ' ');
+            p++;
+            if(strcmp(word, wordtoCheck) == 0){
+                if(atoi(p) >= occurr){
+                    printf("%s\r\n", file);
+                }
+            }
+        }
     }
-
     fclose(report);
+    free(word);
+    free(file);
+    free(p);
 }
     
 void execute(char *inputFile, char *excluded){
@@ -155,8 +240,10 @@ void execute(char *inputFile, char *excluded){
     
     while(!endOfLineDetected){ //read line by line the input file in order to save the path in a structure
         line1 = getLineOfAnySize(fInput,128,&endOfLineDetected,&nrOfCharRead);
-        if(strcmp(excluded, get_filename_ext(line1)) == 0){
-            continue;
+        if(excluded != NULL){
+            if(strcmp(excluded, get_filename_ext(line1)) == 0){
+                continue;
+            }
         }
         fList *node = malloc (sizeof(fList));
         node->path = line1;
@@ -294,7 +381,7 @@ void writeFile(fWord *w, fWord *wordHead, char * outputFile){
     printf("\n");
 }
 
-void executeVerbose(char *inputFile){
+void executeVerbose(char *inputFile, char *excluded){
 
     clock_t t;
 
@@ -307,6 +394,11 @@ void executeVerbose(char *inputFile){
     
     while(!endOfLineDetected){ //read line by line the input file in order to save the path in a structure
         line1 = getLineOfAnySize(fInput,128,&endOfLineDetected,&nrOfCharRead);
+        if(excluded != NULL){
+            if(strcmp(excluded, get_filename_ext(line1)) == 0){
+                continue;
+            }
+        }
         fList *node = malloc (sizeof(fList));
         node->path = line1;
         node->next = NULL;
@@ -440,7 +532,4 @@ char *get_filename_ext(char *filename) {
     char *dot = strrchr(filename, '.');
     if(!dot || dot == filename) return "";
     return dot + 1;
-}
-
-
-
+}   
