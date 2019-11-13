@@ -40,17 +40,18 @@ int main(int argc, char * argv[]){
 
      //find --words|-w <inputfile> 
     if(argc == 3 && ((strcmp(argv[1], "--words") == 0) || (strcmp(argv[1], "-w") == 0))){
-        execute(argv[2]);
+        execute(argv[2], NULL);
         print(w, wordHead);
     }else if(argc > 3){
         for(int i = 3; i<argc; i++){
             if((strcmp(argv[i], "--output") == 0) || (strcmp(argv[i], "-o") == 0)){
-                execute(argv[2]);
+                execute(argv[2], NULL);
                 //bisogna anche stampare su console???
                 writeFile(w, wordHead, argv[i+1]);
             }
             if((strcmp(argv[i], "--exclude") == 0) || (strcmp(argv[i], "-e") == 0)){
-                //esclude alcuni path quindi non devo usare execute ma un metodo nuovo
+                execute(argv[2], argv[i+1]);
+                print(w, wordHead);
             }
             if((strcmp(argv[i], "--verbose") == 0) || (strcmp(argv[i], "-v") == 0)){
                 executeVerbose(argv[2]);
@@ -143,7 +144,8 @@ void getFileOccurrences(char *reportFile){
     fclose(report);
 }
     
-void execute(char *inputFile){
+void execute(char *inputFile, char *excluded){
+
     fInput = fopen(inputFile, "r"); //the file that contains the path of the file in which search.
 
     if(fInput == NULL){
@@ -153,6 +155,9 @@ void execute(char *inputFile){
     
     while(!endOfLineDetected){ //read line by line the input file in order to save the path in a structure
         line1 = getLineOfAnySize(fInput,128,&endOfLineDetected,&nrOfCharRead);
+        if(strcmp(excluded, get_filename_ext(line1)) == 0){
+            continue;
+        }
         fList *node = malloc (sizeof(fList));
         node->path = line1;
         node->next = NULL;
@@ -429,6 +434,12 @@ void freeMemory(){
     free(pathHead);
     free(pathTail);
     free(positionHead);
+}
+
+char *get_filename_ext(char *filename) {
+    char *dot = strrchr(filename, '.');
+    if(!dot || dot == filename) return "";
+    return dot + 1;
 }
 
 
