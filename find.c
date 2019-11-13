@@ -21,6 +21,13 @@
 
     fPosition *positionHead = NULL;
 
+    int var = 0;
+
+    int outputFlag = 0;
+
+    char *ext = NULL;
+    char *out = NULL;
+
 int main(int argc, char * argv[]){
 
     if(argc == 1){ //stampa le informazioni sul programma
@@ -38,49 +45,51 @@ int main(int argc, char * argv[]){
 		return 0;
 	}
 
-    //sistemare selezione parametri
-
     //find --words|-w <inputfile>
     if(argc == 3 && ((strcmp(argv[1], "--words") == 0) || (strcmp(argv[1], "-w") == 0))){
-        execute(argv[2], NULL);
+        execute(argv[2], ext, var);
         print(w, wordHead);
     }else if(argc > 3){
-        for(int i = 3; i<argc; i++){
-            if((strcmp(argv[i], "--output") == 0) || (strcmp(argv[i], "-o") == 0)){
-                execute(argv[2], NULL);
-                printf("w, wordHead");
-                writeFile(w, wordHead, argv[i+1]);
-                i++;
+        //operazioni da effettuare sul file di report
+        if(((strcmp(argv[1], "--report") == 0) || (strcmp(argv[1], "-r") == 0)) && (strcmp(argv[3], "--show") == 0)){
+                if(argv[5] != NULL){
+                if(strcmp(argv[5], "--file") == 0){
+                    //fine --report|-r <reportfile> --show <word> --file <file>
+                    //Stampare tutte le posizioni dove la parola <word> occorre nel file <file>:
+                    //Se <word> non occorre in <file>, viene stampato a video un messaggio opportuno.
+                    getWordOccurences(argv[4], argv[2], argv[6]);
+                }else{
+                    //find --report|-r <reportfile> --show <word> <n>
+                    //Stampare la lista dei file dove occorre almeno <n> volte la parola <word>:
+                    getFileList(argv[2], argv[4], atoi(argv[5]));
+                }
+                }else{
+                    //Se <n> viene omesso, si utilizza il valore 1.
+                getFileList(argv[2], argv[4], 1);
+                }
+        }else{
+            for(int i = 3; i<argc; i++){
+                if((strcmp(argv[i], "--output") == 0) || (strcmp(argv[i], "-o") == 0)){
+                    outputFlag = 1;
+                    out = argv[i+1];
+                    i++;
+                }
+                if((strcmp(argv[i], "--exclude") == 0) || (strcmp(argv[i], "-e") == 0)){
+                    ext = argv[i+1];
+                    i++;
+                }
+                if((strcmp(argv[i], "--verbose") == 0) || (strcmp(argv[i], "-v") == 0)){
+                    var = 1;
+                    print(w,wordHead);
+                }
             }
-            if((strcmp(argv[i], "--exclude") == 0) || (strcmp(argv[i], "-e") == 0)){
-                execute(argv[2], argv[i+1]);
-                print(w, wordHead);
-                i++;
-            }
-            if((strcmp(argv[i], "--verbose") == 0) || (strcmp(argv[i], "-v") == 0)){
-                executeVerbose(argv[2], NULL);
-                print(w,wordHead);
-            }
-        }
-    }
+            execute(argv[2], ext, var);
+            print(w, wordHead);
 
-    //operazioni da effettuare sul file di report
-    if(((strcmp(argv[1], "--report") == 0) || (strcmp(argv[1], "-r") == 0)) && (strcmp(argv[3], "--show") == 0)){
-            if(argv[5] != NULL){
-               if(strcmp(argv[5], "--file") == 0){
-                   //fine --report|-r <reportfile> --show <word> --file <file>
-                   //Stampare tutte le posizioni dove la parola <word> occorre nel file <file>:
-                   //Se <word> non occorre in <file>, viene stampato a video un messaggio opportuno.
-                   getWordOccurences(argv[4], argv[2], argv[6]);
-               }else{
-                //find --report|-r <reportfile> --show <word> <n>
-                //Stampare la lista dei file dove occorre almeno <n> volte la parola <word>:
-                getFileList(argv[2], argv[4], atoi(argv[5]));
-               }
-            }else{
-                //Se <n> viene omesso, si utilizza il valore 1.
-               getFileList(argv[2], argv[4], 1);
+            if(outputFlag == 1){
+                writeFile(w, wordHead, out);
             }
+        } 
     }
 
     freeMemory();
@@ -229,100 +238,6 @@ void getFileList(char *reportFile, char *wordtoCheck, int occurr){
     free(p);
 }
     
-void execute(char *inputFile, char *excluded){
-
-    fInput = fopen(inputFile, "r"); //the file that contains the path of the file in which search.
-
-    if(fInput == NULL){
-        fprintf(stderr, "Cannot open %s, exiting. . .\n", inputFile);
-    	exit(1);
-    }
-    
-    while(!endOfLineDetected){ //read line by line the input file in order to save the path in a structure
-        line1 = getLineOfAnySize(fInput,128,&endOfLineDetected,&nrOfCharRead);
-        if(excluded != NULL){
-            if(strcmp(excluded, get_filename_ext(line1)) == 0){
-                continue;
-            }
-        }
-        fList *node = malloc (sizeof(fList));
-        node->path = line1;
-        node->next = NULL;
-
-        if(listHead == NULL){
-            listHead = listTail = node;
-        }else{
-            listTail = listTail->next = node;
-        }
-    }
-
-    list = listHead;
-
-    fclose(fInput);
-
-    do{
-        fWord *app = malloc(sizeof(fWord));
-        printf("Insert the word to search: ");
-        scanf("%s", app->word);
-        app->totalOccurences = 0;
-        app->p = NULL;
-        app->next = NULL;
-
-        if(wordHead == NULL){
-            wordTail = wordHead = app;
-        }else{
-            wordTail = wordTail->next = app;
-        }
-        printf("Do you want to insert another word? (Y/N): ");
-        scanf(" %c", &ch);
-    }while(ch == 'y' || ch == 'Y');
-
-    w = wordHead;
-
-    while(w != NULL){
-        while(list != NULL){
-            w->p = malloc(sizeof(fPath));
-            w->p->fileOccurrences = 0;
-            w->p->path = list->path;
-            w->p->position = NULL;
-            w->p->next = NULL;
-
-            if(pathHead == NULL){
-                pathTail = pathHead = w->p;
-            }else{
-                pathTail = pathTail->next = w->p;
-            }
-
-            fp = fopen(w->p->path, "r"); 
-            if(fp == NULL){
-                fprintf(stderr, "Cannot open %s, exiting. . .\n", w->p->path);
-                exit(1);
-            }
-
-            int countLine = 0;
-            endOfLineDetected = 0;
-
-            while(!endOfLineDetected){
-                line2 = getLineOfAnySize(fp,128,&endOfLineDetected,&nrOfCharRead);
-                int n = strlen(line2);
-                int m = strlen(w->word);
-                w->p->fileOccurrences = w->p->fileOccurrences + KMP(line2, w->word, n, m, countLine, w->p);
-                countLine = countLine + 1;
-            }   
-
-            w->totalOccurences = w->totalOccurences + w->p->fileOccurrences;
-            w->p->position = getHead(); 
-            w->p = w->p->next;
-            list = list->next;
-            fclose(fp);
-        }
-        w->p = pathHead;
-        list = listHead;
-        w = w->next;
-        pathHead = NULL;
-    }
-}
-
 void print(fWord *w, fWord *wordHead){
      
     w = wordHead;
@@ -381,9 +296,11 @@ void writeFile(fWord *w, fWord *wordHead, char * outputFile){
     printf("\n");
 }
 
-void executeVerbose(char *inputFile, char *excluded){
+void execute(char *inputFile, char *excluded, int num){
 
     clock_t t;
+
+    double time_taken = 0;
 
     fInput = fopen(inputFile, "r"); //the file that contains the path of the file in which search.
 
@@ -434,7 +351,7 @@ void executeVerbose(char *inputFile, char *excluded){
     w = wordHead;
 
     while(w != NULL){
-        printf("Inizio elaborazione parola: %s\r\n", w->word);
+        if(num == 1) printf("Inizio elaborazione parola: %s\r\n", w->word);
         while(list != NULL){
             w->p = malloc(sizeof(fPath));
             w->p->fileOccurrences = 0;
@@ -454,9 +371,9 @@ void executeVerbose(char *inputFile, char *excluded){
                 exit(1);
             }
 
-            printf("Inizio elaborazione directory: DA FARE\r\n");
-            printf("Inizio elaborazione file: %s\r\n", list->path);
-            t = clock();
+            if(num == 1) printf("Inizio elaborazione directory: DA FARE\r\n");
+            if(num == 1) printf("Inizio elaborazione file: %s\r\n", list->path);
+            if(num == 1) t = clock();
 
             int countLine = 0;
             endOfLineDetected = 0;
@@ -469,17 +386,20 @@ void executeVerbose(char *inputFile, char *excluded){
                 countLine = countLine + 1;
             }   
 
-            t = clock() - t;
-            double time_taken = ((double)t)/CLOCKS_PER_SEC;
+            if(num == 1){
+                t = clock() - t;
+                double time_taken = ((double)t)/CLOCKS_PER_SEC;
+            } 
+                
 
-            printf("Fine elaborazione file: %s (%f)\r\n", list->path, time_taken);
+            if(num == 1) printf("Fine elaborazione file: %s (%f)\r\n", list->path, time_taken);
             w->totalOccurences = w->totalOccurences + w->p->fileOccurrences;
             w->p->position = getHead(); 
             w->p = w->p->next;
             list = list->next;
             fclose(fp);
         }
-        printf("Fine elaborazione parola: %s\r\n", w->word);
+        if(num == 1) printf("Fine elaborazione parola: %s\r\n", w->word);
         w->p = pathHead;
         list = listHead;
         w = w->next;
