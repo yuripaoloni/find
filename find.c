@@ -294,6 +294,8 @@ void writeFile(fWord *w, fWord *wordHead, char * outputFile){
     }
 
     printf("\n");
+
+    fclose(fOutput);
 }
 
 void execute(char *inputFile, char *excluded, int num){
@@ -307,10 +309,13 @@ void execute(char *inputFile, char *excluded, int num){
     if(fInput == NULL){
         fprintf(stderr, "Cannot open %s, exiting. . .\n", inputFile);
     	exit(1);
+    }else{
+        printf("Opened %s successfully\r\n", inputFile);
     }
     
     while(!endOfLineDetected){ //read line by line the input file in order to save the path in a structure
         line1 = getLineOfAnySize(fInput,128,&endOfLineDetected,&nrOfCharRead);
+        //if(endOfLineDetected) break; //questo
         if(excluded != NULL){
             if(strcmp(excluded, get_filename_ext(line1)) == 0){
                 continue;
@@ -321,7 +326,7 @@ void execute(char *inputFile, char *excluded, int num){
         node->next = NULL;
 
         if(listHead == NULL){
-            listHead = listTail = node;
+            listTail = listHead = node;
         }else{
             listTail = listTail->next = node;
         }
@@ -369,6 +374,8 @@ void execute(char *inputFile, char *excluded, int num){
             if(fp == NULL){
                 fprintf(stderr, "Cannot open %s, exiting. . .\n", w->p->path);
                 exit(1);
+            }else{
+                printf("Opened %s successfully\r\n", w->p->path);
             }
 
             if(num == 1) printf("Inizio elaborazione directory: DA FARE\r\n");
@@ -388,10 +395,9 @@ void execute(char *inputFile, char *excluded, int num){
 
             if(num == 1){
                 t = clock() - t;
-                double time_taken = ((double)t)/CLOCKS_PER_SEC;
+                time_taken = ((double)t)/CLOCKS_PER_SEC;
             } 
                 
-
             if(num == 1) printf("Fine elaborazione file: %s (%f)\r\n", list->path, time_taken);
             w->totalOccurences = w->totalOccurences + w->p->fileOccurrences;
             w->p->position = getHead(); 
