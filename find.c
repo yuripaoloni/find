@@ -33,7 +33,7 @@ int main(int argc, char * argv[]){
     if(argc == 1){ //stampa le informazioni sul programma
 		printf("Il programma find consente di individuare il numero di occorrenze di un insieme di stringhe all'interno di un grpathHeadpo di file.\r\n");
 		printf("Per eseguire il programma utilizzare i seguenti parametri:\r\n");
-		printf(" find --word|-w <inputfile> : per stampare il report alla fine dell'esecuzione\r\n");
+		printf(" find --word|-w <wordfile> --input|-i <inputFile> : per stampare il report alla fine dell'esecuzione\r\n");
 		printf("Parametri opzionali:\r\n");
 		printf(" --output|-o <outputfile> : per salvare il report su un file particolare\r\n");
 		printf(" --exclude|-e <ext> : durante la fase di analisi sara' possibile ignorare i file con specifiche estensioni\r\n");
@@ -45,11 +45,13 @@ int main(int argc, char * argv[]){
 		return 0;
 	}
 
-    //find --words|-w <inputfile>
-    if(argc == 3 && ((strcmp(argv[1], "--words") == 0) || (strcmp(argv[1], "-w") == 0))){
-        execute(argv[2], ext, var);
+    //find (--words|-w) <wordfile> (--input|-i) <inputfile> 
+    if(argc == 5 
+       && ((strcmp(argv[1], "--words") == 0) || (strcmp(argv[1], "-w") == 0))
+       && ((strcmp(argv[3], "--input") == 0) || (strcmp(argv[3], "-i") == 0))){
+        execute(NULL, argv[4], ext, var);
         print(w, wordHead);
-    }else if(argc > 3){
+    }else if(argc > 5){
         //operazioni da effettuare sul file di report
         if(((strcmp(argv[1], "--report") == 0) || (strcmp(argv[1], "-r") == 0)) && (strcmp(argv[3], "--show") == 0)){
                 if(argv[5] != NULL){
@@ -83,7 +85,7 @@ int main(int argc, char * argv[]){
                     print(w,wordHead);
                 }
             }
-            execute(argv[2], ext, var);
+            execute(NULL, argv[2], ext, var);
             print(w, wordHead);
 
             if(outputFlag == 1){
@@ -298,7 +300,7 @@ void writeFile(fWord *w, fWord *wordHead, char * outputFile){
     fclose(fOutput);
 }
 
-void execute(char *inputFile, char *excluded, int num){
+void execute(char *wordFile, char *inputFile, char *excluded, int num){
 
     clock_t t;
 
