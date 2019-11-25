@@ -34,7 +34,7 @@ To generate a new report, indicate the words to be searched and the directories 
 <pathk> [r]\r\n
 \r\n
 ```
-Each *<pathi>* can be an absolute path or relative to a file or directory. In the second case, the optional parameter '' r '' will indicate if it is necessary to recursively analyze the subdirectories. If not present only the regular files in the directory will be analyzed.
+Each ```<pathi>``` can be an absolute path or relative to a file or directory. In the second case, the optional parameter *r* will indicate if it is necessary to recursively analyze the subdirectories. If not present only the regular files in the directory will be analyzed.
 
 Instead, the list of words to search for will be passed to the program through a form file:
 
@@ -77,19 +77,19 @@ In this case, for each file (or directory) analyzed, it will be necessary to pri
 Once the report file is generated, the *find* program can be used to retrieve the saved information. We could:mmo:
 
 
-Print the list of files where at least *<n>* times the word *<word>* occurs:
+Print the list of files where at least ```<n>``` times the word ```<word>``` occurs:
 
 ```
 fine --report|-r <reportfile> --show <word> <n>
 ```
 
-If *<n>* is omitted, the value *1* is used.
+If ```<n>``` is omitted, the value *1* is used.
 
-Print all the positions where the word *<word>* occurs in the file *<file>*:
+Print all the positions where the word ```<word>``` occurs in the file ```<file>```:
 
 ```
 fine --report|-r <reportfile> --show <word> --file <file>
 
 ```
 
-If *<word>* is not needed in *<file>*, a suitable message is printed on the screen.
+If ```<word>``` is not needed in ```<file>```, a suitable message is printed on the screen.
