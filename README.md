@@ -72,7 +72,7 @@ Finally, to view the analysis process you can add the parameter:
 
 In this case, for each file (or directory) analyzed, it will be necessary to print messages indicating the beginning of the processing, the term and the time required for the analysis.
 
-#### Analisi dei report
+#### report analysis
 
 Once the report file is generated, the *find* program can be used to retrieve the saved information. We could:mmo:
 
@@ -93,3 +93,12 @@ fine --report|-r <reportfile> --show <word> --file <file>
 ```
 
 If ```<word>``` is not needed in ```<file>```, a suitable message is printed on the screen.
+
+## Authors
+
+* **Yuri Paoloni** - [yuripaoloni](https://github.com/yuripaoloni)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
