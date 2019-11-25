@@ -1,20 +1,14 @@
 # find
 
 The find application allows you to identify the number of occurrences of a set of strings within a group of files. To determine the number of occurrences (and their position) the Knuth-Morris and Pratt algorithm is used. At each execution, the application will output the list of files analyzed with the occurrences of the string in the text together with information regarding its position. The same information produced in output can be saved on an external file.
+The find application can be used both to generate analysis reports and to extract information from reports generated in previous executions.
 
-L'applicazione ''find'' può essere usata sia per generare dei report delle analisi che per estrarre informazioni da report generati in esecuzioni precedenti. 
+To generate a new report, indicate the words to be searched and the directories or files to be searched. The files and directories to be analyzed will be listed in a file, to be passed as input to the program, with the following structure:
 
-== Generazione di report ==
-
-Per generare un nuovo report occorre indicare le parole da ricercare e le directory o file dove eseguire la ricerca. I file e le directory da analizzare verranno elencate in un file, da passare come input al programma, con la seguente struttura:
-
-<code>
-<path1> [r]\r\n
-<path2> [r]\r\n
-...
-<pathk> [r]\r\n
-\r\n
-</code>
+<code> path1</code>
+<code> path2</code>
+      ....
+      pathk
 
 Ogni ''<pathi>'' potrà essere un path assoluto o relativo ad un file o directory. Nel secondo caso, il parametro ''r'', opzionale, indicherà se occorra analizzare ricorsivamente le sottodirectory. Se non presente solo i file regolari nella directory verranno analizzati. 
 
