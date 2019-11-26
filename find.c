@@ -174,11 +174,7 @@ void listFilesRecursively(char *basePath, char *recursive, int a, char *exclude)
         n->directory = str; //save the directory
         n->next = NULL;
         //creating the structure
-        // if(listHead == NULL){
-        //     listTail = listHead = n;
-        // }else{
-        //     listTail = listTail->next = n;
-        // }
+        //and sorting alphabetically
         if(listHead == NULL || strcmp(n->path, listHead->path) < 0){
             n->next = listHead;
             listHead = n;
@@ -204,7 +200,7 @@ void listFilesRecursively(char *basePath, char *recursive, int a, char *exclude)
 
                 // Construct new path from our base path
                 strcpy(path, basePath);
-                strcat(path, "\\"); 
+                strcat(path, "\\"); //on linux use / instead of "\\"
                 strcat(path, dp->d_name); //adding the file name to the path
                 
                 if (is_regular_file(path)){
@@ -215,15 +211,11 @@ void listFilesRecursively(char *basePath, char *recursive, int a, char *exclude)
                     }
                     fList *node = malloc (sizeof(fList));
                     node->path = strdup(path); //the file path
-                    //SU LINUX TOGLIERE STRDUP SU BASEPATH
+                    //on linux delete strdup from basePath
                     node->directory = strdup(basePath); //the directory path
                     node->next = NULL;
 
-                    // if(listHead == NULL){
-                    //     listTail = listHead = node;
-                    // }else{
-                    //     listTail = listTail->next = node;
-                    // }
+                    //sort alphabetically
                     if(listHead == NULL || strcmp(node->path, listHead->path) < 0){
                         node->next = listHead;
                         listHead = node;
@@ -293,10 +285,6 @@ void getWordOccurences(char *word, char *file, char *fileToCheck){
                     printf("%s\r\n", curr);
                     continue;
                 }
-                // else{
-                //     printf("La parola %s non occorre nel file %s\r\n", word, fileToCheck);
-                //     break;
-                // }
             }
                     
         }
@@ -430,18 +418,14 @@ void execute(char *wordFile, char *inputFile, char *excluded, int num){
     
     while(!endOfLineDetected){
         line1 = getLineOfAnySize(fInput, 128, &endOfLineDetected, &nrOfCharRead);
-        //if(endOfLineDetected) break;
+        //if(endOfLineDetected) break; //PER LINUX
         
         //saving into the lineList structure
         llist *l = malloc (sizeof(llist));
         l->line = line1;
         l->next = NULL;
 
-        // if(lHead == NULL){
-        //     lTail = lHead = l;
-        // }else{
-        //     lTail = lTail->next = l;
-        // }
+        //sort alphabetically
         if(lHead == NULL || strcmp(l->line, lHead->line) < 0){
             l->next = lHead;
             lHead = l;
@@ -483,11 +467,11 @@ void execute(char *wordFile, char *inputFile, char *excluded, int num){
             }
          }
 
-        //If there's a dot means that it is a file and we pass to the function a zero to indicates this
+        //If it is a file we pass to the function a zero 
         if (is_regular_file(lCurr->line)){
             listFilesRecursively(lCurr->line, rec, 0, excluded);
         }else{
-        //if there ins't a dot means that it is a directory and we pass 1.
+        //if it is a directory we pass 1.
             listFilesRecursively(lCurr->line, rec, 1, excluded);   
         }
 
@@ -509,15 +493,12 @@ void execute(char *wordFile, char *inputFile, char *excluded, int num){
     while(!endOfLineDetected){
         fWord *app = malloc(sizeof(fWord));
         app->word = getLineOfAnySize(fw, 128, &endOfLineDetected, &nrOfCharRead);
+        //if(endOfLineDetected) break; //PER LINUX
         app->totalOccurences = 0;
         app->p = NULL;
         app->next = NULL;
 
-        // if(wordHead == NULL){
-        //     wordTail = wordHead = app;
-        // }else{
-        //     wordTail = wordTail->next = app;
-        // }
+        //sort alphabetically
         if(wordHead == NULL || strcmp(app->word, wordHead->word) < 0){
             app->next = wordHead;
             wordHead = app;
