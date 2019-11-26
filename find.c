@@ -102,10 +102,8 @@ int main(int argc, char * argv[]){
             }
         } 
 
-    freeMemory(); //FARE FREE DI TUTTE LE VARIABILI UTILIZZATE NEI NUOVI METODI
+   freeMemory(); //FARE FREE DI TUTTE LE VARIABILI UTILIZZATE NEI NUOVI METODI
                  // LETTURA RICORSIVA E METODI PER I PARAMETRI NUOVI
-    freeKMP();
-
     return 0;
 }
 
@@ -174,7 +172,7 @@ void listFilesRecursively(char *basePath, char *recursive, int a, char *exclude)
         n->directory = str; //save the directory
         n->next = NULL;
         //creating the structure
-        //and sorting alphabetically
+        //sorting alphabetically
         if(listHead == NULL || strcmp(n->path, listHead->path) < 0){
             n->next = listHead;
             listHead = n;
@@ -200,7 +198,7 @@ void listFilesRecursively(char *basePath, char *recursive, int a, char *exclude)
 
                 // Construct new path from our base path
                 strcpy(path, basePath);
-                strcat(path, "\\"); //on linux use / instead of "\\"
+                strcat(path, "/"); 
                 strcat(path, dp->d_name); //adding the file name to the path
                 
                 if (is_regular_file(path)){
@@ -211,11 +209,11 @@ void listFilesRecursively(char *basePath, char *recursive, int a, char *exclude)
                     }
                     fList *node = malloc (sizeof(fList));
                     node->path = strdup(path); //the file path
-                    //on linux delete strdup from basePath
+                    //on linux leave strdup from basepath
                     node->directory = strdup(basePath); //the directory path
                     node->next = NULL;
 
-                    //sort alphabetically
+                    //sorting alphabetically
                     if(listHead == NULL || strcmp(node->path, listHead->path) < 0){
                         node->next = listHead;
                         listHead = node;
@@ -253,6 +251,10 @@ void getWordOccurences(char *word, char *file, char *fileToCheck){
     char *currentFile;
     char *p;
     int check = 0;
+
+    if(fileToCheck == NULL){
+        printf("Passed a file as arguments\r\n");
+    } else {
 
     f = fopen(file, "r");
     if(f == NULL){
@@ -295,9 +297,7 @@ void getWordOccurences(char *word, char *file, char *fileToCheck){
     }
 
     fclose(f);
-    free(currentWord);
-    free(currentFile);
-    free(p);
+    }
 }
 
 void getFileList(char *reportFile, char *wordtoCheck, int occurr){
@@ -338,9 +338,6 @@ void getFileList(char *reportFile, char *wordtoCheck, int occurr){
         }
     }
     fclose(report);
-    free(word);
-    free(file);
-    free(p);
 }
     
 void print(fWord *w, fWord *wordHead){
@@ -418,7 +415,7 @@ void execute(char *wordFile, char *inputFile, char *excluded, int num){
     
     while(!endOfLineDetected){
         line1 = getLineOfAnySize(fInput, 128, &endOfLineDetected, &nrOfCharRead);
-        //if(endOfLineDetected) break; //PER LINUX
+        //if(endOfLineDetected) break;
         
         //saving into the lineList structure
         llist *l = malloc (sizeof(llist));
@@ -467,7 +464,7 @@ void execute(char *wordFile, char *inputFile, char *excluded, int num){
             }
          }
 
-        //If it is a file we pass to the function a zero 
+        //If it is a file we pass to the function a zero
         if (is_regular_file(lCurr->line)){
             listFilesRecursively(lCurr->line, rec, 0, excluded);
         }else{
@@ -493,7 +490,7 @@ void execute(char *wordFile, char *inputFile, char *excluded, int num){
     while(!endOfLineDetected){
         fWord *app = malloc(sizeof(fWord));
         app->word = getLineOfAnySize(fw, 128, &endOfLineDetected, &nrOfCharRead);
-        //if(endOfLineDetected) break; //PER LINUX
+	    //if(endOfLineDetected) break;
         app->totalOccurences = 0;
         app->p = NULL;
         app->next = NULL;
@@ -575,6 +572,15 @@ void execute(char *wordFile, char *inputFile, char *excluded, int num){
 
 void freeMemory(){
 
+    lCurr = lHead;
+    llist *templl = NULL;
+
+    while(lCurr != NULL){
+        templl = lCurr;
+        lCurr = lCurr->next;
+        free(templl);
+    }
+
     list = listHead;
     fList *tempL = NULL;
     while(list != NULL){
@@ -605,13 +611,13 @@ void freeMemory(){
 
     free(line1);
     free(line2);
-    free(wordHead);
-    free(wordTail);
-    free(listHead);
-    free(listTail);
-    free(pathHead);
-    free(pathTail);
-    free(positionHead);
+    //free(wordHead);
+    //free(wordTail);
+    //free(listHead);
+    //free(listTail);
+    //free(pathHead);
+    //free(pathTail);
+    //free(positionHead);
 }
 
 char *get_filename_ext(char *filename) {
