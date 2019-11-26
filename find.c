@@ -102,7 +102,8 @@ int main(int argc, char * argv[]){
             }
         } 
 
-    freeMemory(); //fare free delle variabili utilizzate nella lettura ricorsiva
+    freeMemory(); //FARE FREE DI TUTTE LE VARIABILI UTILIZZATE NEI NUOVI METODI
+                 // LETTURA RICORSIVA E METODI PER I PARAMETRI NUOVI
     freeKMP();
 
     return 0;
@@ -173,10 +174,21 @@ void listFilesRecursively(char *basePath, char *recursive, int a, char *exclude)
         n->directory = str; //save the directory
         n->next = NULL;
         //creating the structure
-        if(listHead == NULL){
-            listTail = listHead = n;
-        }else{
-            listTail = listTail->next = n;
+        // if(listHead == NULL){
+        //     listTail = listHead = n;
+        // }else{
+        //     listTail = listTail->next = n;
+        // }
+        if(listHead == NULL || strcmp(n->path, listHead->path) < 0){
+            n->next = listHead;
+            listHead = n;
+        } else {
+            listTail = listHead;
+            while((listTail->next != NULL) && (strcmp(n->path, listTail->next->path) >= 0)){
+                listTail = listTail->next;
+            }
+            n->next = listTail->next;
+            listTail->next = n;
         }
     }else{ //if it's a directory
         char *path = malloc(sizeof(char)*1000); //will store the path
@@ -207,10 +219,21 @@ void listFilesRecursively(char *basePath, char *recursive, int a, char *exclude)
                     node->directory = strdup(basePath); //the directory path
                     node->next = NULL;
 
-                    if(listHead == NULL){
-                        listTail = listHead = node;
-                    }else{
-                        listTail = listTail->next = node;
+                    // if(listHead == NULL){
+                    //     listTail = listHead = node;
+                    // }else{
+                    //     listTail = listTail->next = node;
+                    // }
+                    if(listHead == NULL || strcmp(node->path, listHead->path) < 0){
+                        node->next = listHead;
+                        listHead = node;
+                    } else {
+                        listTail = listHead;
+                        while((listTail->next != NULL) && (strcmp(node->path, listTail->next->path) >= 0)){
+                            listTail = listTail->next;
+                        }   
+                        node->next = listTail->next;
+                        listTail->next = node;
                     }
                 }
 
@@ -237,6 +260,7 @@ void getWordOccurences(char *word, char *file, char *fileToCheck){
     char *currentWord;
     char *currentFile;
     char *p;
+    int check = 0;
 
     f = fopen(file, "r");
     if(f == NULL){
@@ -265,16 +289,23 @@ void getWordOccurences(char *word, char *file, char *fileToCheck){
         if(strcmp(currentWord, word) == 0){
             if(strcmp(currentFile, fileToCheck) == 0){
                 if(atoi(p) > 0){
+                    check = 1;
                     printf("%s\r\n", curr);
                     continue;
-                }else{
-                    printf("La parola %s non occorre nel file %s\r\n", word, fileToCheck);
-                    break;
                 }
+                // else{
+                //     printf("La parola %s non occorre nel file %s\r\n", word, fileToCheck);
+                //     break;
+                // }
             }
                     
         }
     }
+
+    if(check == 0){
+         printf("La parola %s non occorre nel file %s\r\n", word, fileToCheck);
+    }
+
     fclose(f);
     free(currentWord);
     free(currentFile);
@@ -405,10 +436,22 @@ void execute(char *wordFile, char *inputFile, char *excluded, int num){
         llist *l = malloc (sizeof(llist));
         l->line = line1;
         l->next = NULL;
-        if(lHead == NULL){
-            lTail = lHead = l;
-        }else{
-            lTail = lTail->next = l;
+
+        // if(lHead == NULL){
+        //     lTail = lHead = l;
+        // }else{
+        //     lTail = lTail->next = l;
+        // }
+        if(lHead == NULL || strcmp(l->line, lHead->line) < 0){
+            l->next = lHead;
+            lHead = l;
+        } else {
+            lTail = lHead;
+            while((lTail->next != NULL) && (strcmp(l->line, lTail->next->line) >= 0)){
+                lTail = lTail->next;
+            }
+            l->next = lTail->next;
+            lTail->next = l;
         }
     }
 
@@ -470,10 +513,21 @@ void execute(char *wordFile, char *inputFile, char *excluded, int num){
         app->p = NULL;
         app->next = NULL;
 
-        if(wordHead == NULL){
-            wordTail = wordHead = app;
-        }else{
-            wordTail = wordTail->next = app;
+        // if(wordHead == NULL){
+        //     wordTail = wordHead = app;
+        // }else{
+        //     wordTail = wordTail->next = app;
+        // }
+        if(wordHead == NULL || strcmp(app->word, wordHead->word) < 0){
+            app->next = wordHead;
+            wordHead = app;
+        } else {
+            wordTail = wordHead;
+            while((wordTail->next != NULL) && (strcmp(app->word, wordTail->next->word) >= 0)){
+                wordTail = wordTail->next;
+            }
+            app->next = wordTail->next;
+            wordTail->next = app;
         }
     }
 
