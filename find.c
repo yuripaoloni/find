@@ -1,12 +1,13 @@
 #include "find.h"
 
-    FILE *fInput = NULL;  
-    FILE *fp = NULL;
-    FILE *fw = NULL;
-    char *line1; 
-    char *line2;
-    int endOfLineDetected = 0;
-    size_t nrOfCharRead = 0;
+#define WORD_STR "WORD"
+#define WORD_LEN 4
+
+#define FILE_STR "FILE"
+#define FILE_LEN 4
+
+#define OCCURRENCES_STR "OCCURRENCES"
+#define OCCURRENCES_LEN 11
 
     fWord *w = NULL;
     fWord *wordHead = NULL;
@@ -23,18 +24,12 @@
     llist *lTail = NULL;
     llist *lCurr = NULL;
 
-    char *rec; //will store the r that indicates if a file should be read recursively
-
-    fPosition *positionHead = NULL;
-
-    int var = 0;
-
-    int outputFlag = 0;
-
-    char *ext = NULL;
-    char *out = NULL;
-
 int main(int argc, char * argv[]){
+
+    int verboseFlag = 0; //set to 1 if the --verbose|-v param is passed
+    int outputFlag = 0; //set to 1 if the --output|-o param is passed
+    char *ext = NULL; //stores the extension to exclude
+    char *out = NULL; //stores the file in which write the program output
 
     if(argc == 1){ //stampa le informazioni sul programma
 		printf("Il programma find consente di individuare il numero di occorrenze di un insieme di stringhe all'interno di un grpathHeadpo di file.\r\n");
@@ -52,403 +47,74 @@ int main(int argc, char * argv[]){
 	}
 
     //operazioni da effettuare sul file di report
-    if(((strcmp(argv[1], "--report") == 0) || (strcmp(argv[1], "-r") == 0)) && (strcmp(argv[3], "--show") == 0)){
+    if(((strcmp(argv[1], "--report") == 0) || (strcmp(argv[1], "-r") == 0))
+        && (argv[3] != NULL && (strcmp(argv[3], "--show") == 0))){
         if(argv[5] != NULL){
-            if(strcmp(argv[5], "--file") == 0){
-                //fine --report|-r <reportfile> --show <word> --file <file>
-                //Stampare tutte le posizioni dove la parola <word> occorre nel file <file>:
-                 //Se <word> non occorre in <file>, viene stampato a video un messaggio opportuno.
-                getWordOccurences(argv[4], argv[2], argv[6]);
-            }else{
-                //find --report|-r <reportfile> --show <word> <n>
-                //Stampare la lista dei file dove occorre almeno <n> volte la parola <word>:
-                getFileList(argv[2], argv[4], atoi(argv[5]));
+            if(strcmp(argv[5], "--file") == 0){        
+                argumentsCheck(argv[4], "Please provide a word to search.");     
+                argumentsCheck(argv[6], "Please provide a file.");   
+                getWordOccurences(argv[4], argv[2], argv[6]); //find --report|-r <reportfile> --show <word> --file <file>
+            }else{  
+                argumentsCheck(argv[4], "Please provide a word to search.");            
+                getFileList(argv[2], argv[4], atoi(argv[5])); //find --report|-r <reportfile> --show <word> <n>
             }
-        }else{
-            //Se <n> viene omesso, si utilizza il valore 1.
-            getFileList(argv[2], argv[4], 1);
+        }else{ 
+            argumentsCheck(argv[4], "Please provide a word to search.");   
+            getFileList(argv[2], argv[4], 1); //Se <n> viene omesso, si utilizza il valore 1.
         }
-
     //find (--words|-w) <wordfile> (--input|-i) <inputfile> 
     }else if(argc == 5 
        && ((strcmp(argv[1], "--words") == 0) || (strcmp(argv[1], "-w") == 0))
        && ((strcmp(argv[3], "--input") == 0) || (strcmp(argv[3], "-i") == 0))){
-        execute(argv[2], argv[4], ext, var);
-        print(w, wordHead);
+        execute(argv[2], argv[4], ext, verboseFlag, outputFlag, out);
     }else if(argc > 5
         && ((strcmp(argv[1], "--words") == 0) || (strcmp(argv[1], "-w") == 0))
         && ((strcmp(argv[3], "--input") == 0) || (strcmp(argv[3], "-i") == 0))){
-        
             for(int i = 3; i<argc; i++){
                 if((strcmp(argv[i], "--output") == 0) || (strcmp(argv[i], "-o") == 0)){
                     outputFlag = 1;
+                    argumentsCheck(argv[i+1], "Please provide an output file."); 
                     out = argv[i+1];
                     i++;
                 }
                 if((strcmp(argv[i], "--exclude") == 0) || (strcmp(argv[i], "-e") == 0)){
+                    argumentsCheck(argv[i+1], "Please provide the file extesion to exclude.");
                     ext = argv[i+1];
                     i++;
                 }
                 if((strcmp(argv[i], "--verbose") == 0) || (strcmp(argv[i], "-v") == 0)){
-                    var = 1;
-                    print(w,wordHead);
+                    verboseFlag = 1;
                 }
             }
-            execute(argv[2], argv[4], ext, var);
-            print(w, wordHead);
+            execute(argv[2], argv[4], ext, verboseFlag, outputFlag, out);
+    } else {
+        printf("Please provide the correct arguments.\n");
+        exit(1);
+    }
 
-            if(outputFlag == 1){
-                writeFile(w, wordHead, out);
-            }
-        } 
-
-   freeMemory(); //FARE FREE DI TUTTE LE VARIABILI UTILIZZATE NEI NUOVI METODI
+    freeMemory(); //FARE FREE DI TUTTE LE VARIABILI UTILIZZATE NEI NUOVI METODI
                  // LETTURA RICORSIVA E METODI PER I PARAMETRI NUOVI
     return 0;
 }
 
-char * getLineOfAnySize(FILE* fp, size_t typicalSize, int *endOfLineDetected,size_t *nrOfCharRead){ 
-    char *line;       // buffer for our string
-    int ch;           // we will read line character by character
-    size_t len = 0;   // number of characters read (character counter)
-    size_t lineSize = typicalSize;  // initial size of the buffer allocated for the line
-    *nrOfCharRead = 0;
-
-    if(!fp) return NULL; // protection
-
-    // allocating the buffer
-    line = realloc(NULL, sizeof(char)*lineSize); // expected size of the line is pathHead to typicalSize
-
-    if (!line) return line; // protection, if we fail to allocate the memory we will return NULL
-
-    while (1) { // loop forever     
-        ch = fgetc(fp);       // getting character by character from file
-
-        if (ch == '\n') break; // end of line detected - breaking the loop 
-        if( ch == EOF)  {
-            *endOfLineDetected = 1;
-            break; // end of file detected - breaking the loop
-         }
-
-        line[len++] = ch;     // store the character in the line buffer, increase character counter
-
-        if (len == lineSize){ // we reached the end of line buffer (no more room)
-
-            lineSize = lineSize + 64; // we have to increase the line size 
-            line = realloc(line, sizeof(char)*(lineSize)); // line buffer has new size now
-
-            if (!line) return line; // if we fail to allocate memory we will return NULL
-        }
-        if( (len == 0) && *endOfLineDetected){ // empty file
-            *endOfLineDetected = 1;
-            break; 
-        } 
-    }
-
-
-    line[len++] ='\0';  // ending the string (notice there is no '\n' in the string)
-    *nrOfCharRead = len;
-
-    return line;       // return the string
-}
-
-void listFilesRecursively(char *basePath, char *recursive, int a, char *exclude){
-
-    struct dirent *dp;
-    DIR *dir;
-
-    if(a == 0){ //which means is a file
-        char *str = malloc(sizeof(char)*strlen(basePath) + 1);
-        fList *n = malloc (sizeof(fList));
-        n->path = basePath; //we save the path of file into a structure
-        strcpy(str,basePath);
-        //use this loop the obtain the directory, elimating all the character after the last "\"
-        for(int i = strlen(str); i>0; i--){
-            if(str[i] == '\\'){
-                str[i] = '\0';
-                i = 0;
-            }
-        }
-        n->directory = str; //save the directory
-        n->next = NULL;
-        //creating the structure
-        //sorting alphabetically
-        if(listHead == NULL || strcmp(n->path, listHead->path) < 0){
-            n->next = listHead;
-            listHead = n;
-        } else {
-            listTail = listHead;
-            while((listTail->next != NULL) && (strcmp(n->path, listTail->next->path) >= 0)){
-                listTail = listTail->next;
-            }
-            n->next = listTail->next;
-            listTail->next = n;
-        }
-    }else{ //if it's a directory
-        char *path = malloc(sizeof(char)*1000); //will store the path
-        dir = opendir(basePath); //open the directory
-
-        // Unable to open directory stream
-        if (!dir)
-            return;
-
-        while ((dp = readdir(dir)) != NULL){ //we traverse the directory
-
-            if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0){
-
-                // Construct new path from our base path
-                strcpy(path, basePath);
-                strcat(path, "/"); 
-                strcat(path, dp->d_name); //adding the file name to the path
-                
-                if (is_regular_file(path)){
-                    if(exclude != NULL){
-                        if(strcmp(exclude, get_filename_ext(path)) == 0){                           
-                            continue;
-                        }
-                    }
-                    fList *node = malloc (sizeof(fList));
-                    node->path = strdup(path); //the file path
-                    //on linux leave strdup from basepath
-                    node->directory = strdup(basePath); //the directory path
-                    node->next = NULL;
-
-                    //sorting alphabetically
-                    if(listHead == NULL || strcmp(node->path, listHead->path) < 0){
-                        node->next = listHead;
-                        listHead = node;
-                    } else {
-                        listTail = listHead;
-                        while((listTail->next != NULL) && (strcmp(node->path, listTail->next->path) >= 0)){
-                            listTail = listTail->next;
-                        }   
-                        node->next = listTail->next;
-                        listTail->next = node;
-                    }
-                }
-
-                if(recursive == NULL){ //in case we don't need to read recursively
-                    continue;
-                } 
-                    
-                //if we passed a "r" to the function, the program start read recursively 
-                // all the subdirectories
-                if(strcmp(recursive, "r") == 0){ 
-                    listFilesRecursively(path, "r", 1, exclude);
-                }
-            }
-        }
-        closedir(dir);
+void argumentsCheck(const char *args, const char *message){
+    if(args == NULL){
+        printf("%s\n", message);
+        exit(1);
     }
 }
 
-void getWordOccurences(char *word, char *file, char *fileToCheck){
-    FILE *f;
-    char *curr;
-    endOfLineDetected = 0;
-    nrOfCharRead = 0;
-    char *currentWord;
-    char *currentFile;
-    char *p;
-    int check = 0;
-
-    if(fileToCheck == NULL){
-        printf("Passed a file as arguments\r\n");
-    } else {
-
-    f = fopen(file, "r");
-    if(f == NULL){
-        fprintf(stderr, "Cannot open %s, exiting. . .\n", file);
-    	exit(1);
-    }
-
-
-    while(!endOfLineDetected){
-        curr = getLineOfAnySize(f,128,&endOfLineDetected,&nrOfCharRead);
-        if(curr[0] == 'W'){
-            currentWord = strrchr(curr, ' ');
-            currentWord++;
-            continue;
-        }
-        if(curr[0] == 'F'){
-            currentFile = strrchr(curr, ' ');
-            currentFile++;
-            continue;
-        }
-        if(curr[0] == 'O'){
-            p = strrchr(curr, ' ');
-            p++;
-            continue;
-        }
-        if(strcmp(currentWord, word) == 0){
-            if(strcmp(currentFile, fileToCheck) == 0){
-                if(atoi(p) > 0){
-                    check = 1;
-                    printf("%s\r\n", curr);
-                    continue;
-                }
-            }
-                    
-        }
-    }
-
-    if(check == 0){
-         printf("La parola %s non occorre nel file %s\r\n", word, fileToCheck);
-    }
-
-    fclose(f);
-    }
-}
-
-void getFileList(char *reportFile, char *wordtoCheck, int occurr){
-    FILE * report;
-    char *line;
-    endOfLineDetected = 0;
-    nrOfCharRead = 0;
-    char *word;
-    char *file;
-    char *p;
-
-    report = fopen(reportFile, "r");
-    if(report == NULL){
-        fprintf(stderr, "Cannot open %s, exiting. . .\n", reportFile);
-    	exit(1);
-    }
-
-    while(!endOfLineDetected){
-        line = getLineOfAnySize(report,128,&endOfLineDetected,&nrOfCharRead);
-        if(line[0] == 'W'){
-            word = strrchr(line, ' ');
-            word++;  
-            continue;
-        }
-        if(line[0] == 'F'){
-            file = strrchr(line, ' ');
-            file++;
-            continue;
-        }
-        if(line[0] == 'O'){
-            p = strrchr(line, ' ');
-            p++;
-            if(strcmp(word, wordtoCheck) == 0){
-                if(atoi(p) >= occurr){
-                    printf("%s\r\n", file);
-                }
-            }
-        }
-    }
-    fclose(report);
-}
-    
-void print(fWord *w, fWord *wordHead){
-     
-    w = wordHead;
-
-    while(w != NULL){
-        printf("WORD %s \r\n", w->word);
-        printf("TOTAL %d \r\n", w->totalOccurences);
-        pathHead = w->p;
-        while(w->p != NULL){
-            printf("FILE %s \r\n", w->p->path);
-            printf("OCCURENCES %d	\r\n", w->p->fileOccurrences);
-            positionHead = w->p->position;
-            while (w->p->position != NULL){
-                printf("%d %d\r\n", w->p->position->line, w->p->position->character);
-                w->p->position = w->p->position->next;
-            }
-            w->p->position = positionHead;
-            w->p = w->p->next;
-        }
-        w->p = pathHead;
-        w = w->next;
-    }
-
-    w = wordHead;
-
-    printf("\r\n"); //il file termina con una riga vuota
-}
-
-void writeFile(fWord *w, fWord *wordHead, char * outputFile){
-    
-    FILE *fOutput;
-
-    w = wordHead;
-
-    fOutput = freopen(outputFile, "w", stdout);
-
-    while(w != NULL){
-        printf("WORD %s\n", w->word);
-        printf("TOTAL %d\n", w->totalOccurences);
-        pathHead = w->p;
-        while(w->p != NULL){
-            printf("FILE %s\n", w->p->path);
-            printf("OCCURENCES %d\n", w->p->fileOccurrences);
-            positionHead = w->p->position;
-            while (w->p->position != NULL){
-                printf("%d %d\n", w->p->position->line, w->p->position->character);
-                w->p->position = w->p->position->next;
-            }
-            w->p->position = positionHead;
-            w->p = w->p->next;
-        }
-        w->p = pathHead;
-        w = w->next;
-    }
-
-    printf("\n");
-
-    fclose(fOutput);
-}
-
-void execute(char *wordFile, char *inputFile, char *excluded, int num){
-
-    clock_t t;
-
-    double time_taken = 0;
-
-    fInput = fopen(inputFile, "r"); //the file that contains the path of the file in which search.
-
-    if(fInput == NULL){
-        fprintf(stderr, "Cannot open %s, exiting. . .\n", inputFile);
-    	exit(1);
-    }
-    
-    while(!endOfLineDetected){
-        line1 = getLineOfAnySize(fInput, 128, &endOfLineDetected, &nrOfCharRead);
-        //if(endOfLineDetected) break;
-        
-        //saving into the lineList structure
-        llist *l = malloc (sizeof(llist));
-        l->line = line1;
-        l->next = NULL;
-
-        //sort alphabetically
-        if(lHead == NULL || strcmp(l->line, lHead->line) < 0){
-            l->next = lHead;
-            lHead = l;
-        } else {
-            lTail = lHead;
-            while((lTail->next != NULL) && (strcmp(l->line, lTail->next->line) >= 0)){
-                lTail = lTail->next;
-            }
-            l->next = lTail->next;
-            lTail->next = l;
-        }
-    }
-
-    fclose(fInput);
-
-    lCurr = lHead;
-
+void checkingForRecursion(llist *lCurr, const char *excluded){
     int index = 0;
+
+    char *rec = NULL;  //will store the r that indicates if a file should be read recursively
 
     while(lCurr != NULL){ //traverse the lineList structure
         rec = strchr(lCurr->line, ' '); 
         if(rec != NULL) {
             rec++; //saving into rec the "r" if present
             index = 0;
-            //using this loop the save into line only the path, eliminating the "r" at the end.
-            while(1){
+            while(1){ //using this loop the save into line only the path, eliminating the "r" at the end.
                 if(lCurr->line[index] == ' '){
                     lCurr->line[index] = '\0';
                     break;
@@ -462,59 +128,38 @@ void execute(char *wordFile, char *inputFile, char *excluded, int num){
                 lCurr = lCurr->next;
                 continue;
             }
-         }
+        }
 
-        //If it is a file we pass to the function a zero
-        if (is_regular_file(lCurr->line)){
+        if (is_regular_file(lCurr->line)){  //If it is a file we pass to the function a zero
             listFilesRecursively(lCurr->line, rec, 0, excluded);
         }else{
-        //if it is a directory we pass 1.
-            listFilesRecursively(lCurr->line, rec, 1, excluded);   
+            listFilesRecursively(lCurr->line, rec, 1, excluded);  //if it is a directory we pass 1.
         }
 
         lCurr = lCurr->next; //pointing to the next line.
     }
+}
+
+void execute(const char *wordFile, const char *inputFile, const char *excluded, const int verboseFlag, const int outputFlag, const char *outputFile){
+
+    FILE *fp = NULL;
+    clock_t t;
+    clock_t t1;
+    double time_taken = 0;
+    char *appDir = NULL;
+
+    lHead = createllist(lHead, lTail, inputFile);
+    lCurr = lHead;
+
+    checkingForRecursion(lCurr, excluded);
 
     list = listHead; //pointer back to the head of fileList
 
-
-    fw = fopen(wordFile, "r");
-
-    if(fw == NULL){
-        fprintf(stderr, "Cannot open %s, exiting. . .\n", wordFile);
-    	exit(1);
-    }
-
-    endOfLineDetected = 0;
-
-    while(!endOfLineDetected){
-        fWord *app = malloc(sizeof(fWord));
-        app->word = getLineOfAnySize(fw, 128, &endOfLineDetected, &nrOfCharRead);
-	    //if(endOfLineDetected) break;
-        app->totalOccurences = 0;
-        app->p = NULL;
-        app->next = NULL;
-
-        //sort alphabetically
-        if(wordHead == NULL || strcmp(app->word, wordHead->word) < 0){
-            app->next = wordHead;
-            wordHead = app;
-        } else {
-            wordTail = wordHead;
-            while((wordTail->next != NULL) && (strcmp(app->word, wordTail->next->word) >= 0)){
-                wordTail = wordTail->next;
-            }
-            app->next = wordTail->next;
-            wordTail->next = app;
-        }
-    }
-
-    fclose(fw);
-
+    wordHead = createfWord(wordHead, wordTail, wordFile);
     w = wordHead;
 
     while(w != NULL){
-        if(num == 1) printf("Inizio elaborazione parola: %s\r\n", w->word);
+        if(verboseFlag == 1) printf("Inizio elaborazione parola: %s\r\n", w->word);
         while(list != NULL){
             w->p = malloc(sizeof(fPath));
             w->p->fileOccurrences = 0;
@@ -530,44 +175,264 @@ void execute(char *wordFile, char *inputFile, char *excluded, int num){
             }
 
             fp = fopen(w->p->path, "r"); 
+
             if(fp == NULL){
                 fprintf(stderr, "Cannot open %s, exiting. . .\n", w->p->path);
                 exit(1);
             }
 
-            if(num == 1) printf("Inizio elaborazione directory: %s\r\n", list->directory);
-            if(num == 1) printf("Inizio elaborazione file: %s\r\n", list->path);
-            if(num == 1) t = clock();
-
-            int countLine = 0;
-            endOfLineDetected = 0;
-
-            while(!endOfLineDetected){
-                line2 = getLineOfAnySize(fp, 128, &endOfLineDetected, &nrOfCharRead);
-                int n = strlen(line2);
-                int m = strlen(w->word);
-                w->p->fileOccurrences = w->p->fileOccurrences + KMP(line2, w->word, n, m, countLine, w->p);
-                countLine = countLine + 1;
+            if(verboseFlag == 1){
+                if((appDir != NULL && (strcmp(appDir, list->directory) != 0)) || appDir == NULL){
+                    printf("Inizio elaborazione directory: %s\n", list->directory);
+                    t1 = clock();
+                } 
+                appDir = list->directory;
+                printf("Inizio elaborazione file: %s\n", list->path);
+                t = clock();
             }
 
-            if(num == 1){
+            executeKMP(w, fp);
+
+            if(verboseFlag == 1){
                 t = clock() - t;
                 time_taken = ((double)t)/CLOCKS_PER_SEC;
+                printf("Fine elaborazione file: %s (%f)\n", list->path, time_taken);
             } 
-                
-            if(num == 1) printf("Fine elaborazione file: %s (%f)\r\n", list->path, time_taken);
+
             w->totalOccurences = w->totalOccurences + w->p->fileOccurrences;
             w->p->position = getHead(); 
             w->p = w->p->next;
+            if((list->next == NULL || (appDir != NULL && (strcmp(appDir, list->next->directory) != 0))) && verboseFlag == 1){
+                t1 = clock() - t1;
+                time_taken = ((double)t1)/CLOCKS_PER_SEC; 
+                printf("Fine elaborazione directory: %s (%f)\n", appDir, time_taken);
+            }
             list = list->next;
             fclose(fp);
         }
-        if(num == 1) printf("Fine elaborazione parola: %s\r\n", w->word);
+        if(verboseFlag == 1) printf("Fine elaborazione parola: %s\n", w->word);
         w->p = pathHead;
         list = listHead;
         w = w->next;
         pathHead = NULL;
     }
+
+    print(w, wordHead, pathHead);
+    if(outputFlag == 1) writeFile(w, wordHead, pathHead, outputFile);
+}
+
+void executeKMP(fWord *w, FILE *fp){
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t line_size;
+    int countLine = 0;
+
+    while((line_size = getline(&line, &len, fp)) != -1){
+        trimTrailing(line); 
+        int n = strlen(line);
+        int m = strlen(w->word);
+        w->p->fileOccurrences = w->p->fileOccurrences + KMP(line, w->word, n, m, countLine, w->p);
+        countLine = countLine + 1;
+     }
+}
+
+void listFilesRecursively(char *basePath, const char *recursive, const int a, const char *exclude){
+
+    struct dirent *dp;
+    DIR *dir;
+
+    if(a == 0){ //which means is a file
+        char *str = malloc(sizeof(char)*strlen(basePath) + 1);
+        strcpy(str,basePath);
+        for(int i = strlen(str); i>0; i--){ //use this loop the obtain the directory, elimating all the character after the last "\"
+            if(str[i] == '/'){
+                str[i] = '\0';
+                i = 0;
+            }
+        }
+        listHead = createFList(listHead, listTail, basePath, str);
+    }else{ //if it's a directory
+        char *path = malloc(sizeof(char)*1000); //will store the path
+        dir = opendir(basePath); //open the directory
+      
+        if (!dir) return;
+
+        while ((dp = readdir(dir)) != NULL){ //we traverse the directory
+            if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0){
+
+                // Construct new path from our base path
+                strcpy(path, basePath);
+                strcat(path, "/"); 
+                strcat(path, dp->d_name); //adding the file name to the path
+                
+                if (is_regular_file(path)){
+                    if(exclude != NULL){
+                        if(strcmp(exclude, get_filename_ext(path)) == 0){                           
+                            continue;
+                        }
+                    }
+                    listHead = createFList(listHead, listTail, strdup(path), basePath);
+                }
+
+                if(recursive == NULL){ //in case we don't need to read recursively
+                    continue;
+                } 
+                    
+                if(strcmp(recursive, "r") == 0){   //if we passed a "r" to the function, the program start read recursively all the subdirectories
+                    listFilesRecursively(path, "r", 1, exclude);
+                }
+            }
+        }
+        closedir(dir);
+    }
+}
+
+void getWordOccurences(const char *word, const char *file, const char *fileToCheck){
+    FILE *f;
+    char *curr = NULL;
+    size_t len = 0;
+    ssize_t line_size;
+    char *currentWord = NULL;
+    char *currentFile = NULL;
+    char *p = NULL;
+    int check = 0;
+
+    if(fileToCheck == NULL){
+        printf("Pass a file as arguments\r\n");
+        exit(1);
+    }else{
+        f = fopen(file, "r");
+        if(f == NULL){
+            fprintf(stderr, "Cannot open %s, exiting. . .\n", file);
+            exit(1);
+        }
+        while((line_size = getline(&curr, &len, f)) != -1){
+            trimTrailing(curr);
+            if(strncmp(curr, WORD_STR, WORD_LEN) == 0){
+                currentWord = (char*)malloc((strlen(curr) - WORD_LEN + 1)*sizeof(char));
+                sscanf(strchr(curr, ' '), "%s", currentWord);
+                p = NULL;
+                continue;
+            }
+            if(strncmp(curr, FILE_STR, FILE_LEN) == 0){
+                currentFile = (char*)malloc((strlen(curr) - FILE_LEN + 1)*sizeof(char));
+                sscanf(strchr(curr, ' '), "%s", currentFile);
+                continue;
+            }
+            if(strncmp(curr, OCCURRENCES_STR, OCCURRENCES_LEN) == 0){
+                p = (char*)malloc((strlen(curr) - OCCURRENCES_LEN+1)*sizeof(char));
+                sscanf(strchr(curr, ' '), "%s", p);
+                continue;
+            }
+            if((strcmp(currentWord, word) == 0) && currentWord != NULL){
+                if(currentFile != NULL && (strcmp(currentFile, fileToCheck) == 0)){
+                    if(p != NULL && (atoi(p) > 0)){
+                        check = 1;
+                        printf("%s\n", curr);
+                        continue;
+                    }
+                }         
+            }
+        }
+
+        if(check == 0) printf("The word %s doesn't occur in the file %s \n", word, fileToCheck);
+            
+        fclose(f);
+    }
+}
+
+void getFileList(const char *reportFile, const char *wordtoCheck, const int occurr){
+    FILE * report;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t line_size;
+    char *word = NULL;
+    char *file = NULL;
+    char *p = NULL;
+    int check = 0;
+
+    report = fopen(reportFile, "r");
+
+    if(report == NULL){
+        fprintf(stderr, "Cannot open %s, exiting. . .\n", reportFile);
+    	exit(1);
+    }
+
+    while((line_size = getline(&line, &len, report)) != -1){
+        trimTrailing(line);
+        if(strncmp(line, WORD_STR, WORD_LEN) == 0){
+            word = (char*)malloc((strlen(line) - WORD_LEN + 1)*sizeof(char));
+            sscanf(strchr(line, ' '), "%s", word);
+            p = NULL;
+            continue;
+        }
+        if(strncmp(line, FILE_STR, FILE_LEN) == 0){
+            file = (char*)malloc((strlen(line)- FILE_LEN + 1)*sizeof(char));
+            sscanf(strchr(line, ' '), "%s", file);
+            continue;
+        }
+        if(strncmp(line, OCCURRENCES_STR, OCCURRENCES_LEN) == 0){
+            p = (char*)malloc((strlen(line) - OCCURRENCES_LEN + 1)*sizeof(char));
+            sscanf(strchr(line, ' '), "%s", p);
+            continue;
+        }
+
+        if(word!= NULL && (strcmp(word, wordtoCheck) == 0)){
+            if(p != NULL && (atoi(p) >= occurr)){
+                check = 1;
+                printf("%s\n", file);
+                p = NULL;
+                continue;
+            }
+        }
+    }
+    if(check == 0) printf("The word %s doesn't occur in the searched file.\n", wordtoCheck);
+    fclose(report);
+}
+  
+void print(fWord *w, fWord *wordHead, fPath *pathHead){
+     
+    fPosition *positionHead = NULL;
+    w = wordHead;
+
+    while(w != NULL){
+        printf("WORD %s\n", w->word);
+        printf("TOTAL %d\n", w->totalOccurences);
+        pathHead = w->p;
+        while(w->p != NULL){
+            printf("FILE %s\n", w->p->path);
+            printf("OCCURRENCES %d\n", w->p->fileOccurrences);
+            positionHead = w->p->position;
+            while (w->p->position != NULL){
+                printf("%d %d\n", w->p->position->line, w->p->position->character);
+                w->p->position = w->p->position->next;
+            }
+            w->p->position = positionHead;
+            w->p = w->p->next;
+        }
+        w->p = pathHead;
+        w = w->next;
+    }
+
+    w = wordHead;
+
+    printf("\n"); //il file termina con una riga vuota
+}
+
+void writeFile(fWord *w, fWord *wordHead, fPath *pathHead, const char * outputFile){
+    
+    FILE *fOutput;
+
+    fOutput = freopen(outputFile, "w", stdout);
+
+    if(fOutput == NULL){
+        fprintf(stderr, "Problem while creating the file %s, exiting . . .\n", outputFile);
+    	exit(1);
+    }
+
+    print(w, wordHead, pathHead);
+
+    fclose(fOutput);
 }
 
 void freeMemory(){
@@ -578,6 +443,8 @@ void freeMemory(){
     while(lCurr != NULL){
         templl = lCurr;
         lCurr = lCurr->next;
+        templl->next = NULL;
+        free(templl->line);
         free(templl);
     }
 
@@ -586,6 +453,9 @@ void freeMemory(){
     while(list != NULL){
         tempL = list;
         list = list->next;
+        tempL->next = NULL;
+        // free(tempL->directory);
+        // free(tempL->path);
         free(tempL);
     }
 
@@ -598,29 +468,27 @@ void freeMemory(){
             while(w->p->position != NULL){
                 tempO = w->p->position;
                 w->p->position = w->p->position->next;
+                tempO->next = NULL;
                 free(tempO);
             }
             tempP = w->p;
             w->p = w->p->next;
+            tempP->next = NULL;
+            free(tempP->path);
+            free(tempP->directory);
+            free(tempP->position);
             free(tempP);
         }
         tempW = w;
         w = w->next;
+        tempW->next = NULL;
+        free(tempW->p);
+        free(tempW->word);
         free(tempW);
     }
-
-    free(line1);
-    free(line2);
-    //free(wordHead);
-    //free(wordTail);
-    //free(listHead);
-    //free(listTail);
-    //free(pathHead);
-    //free(pathTail);
-    //free(positionHead);
 }
 
-char *get_filename_ext(char *filename) {
+char *get_filename_ext(const char *filename) {
     char *dot = strrchr(filename, '.');
     if(!dot || dot == filename) return "";
     return dot + 1;
