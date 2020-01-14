@@ -1,0 +1,4 @@
+./test/testDir r
+./test/testDir/testFile1
+./test/testDir/testFile1
+./test/testDir/testFile
