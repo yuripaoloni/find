@@ -1,6 +1,8 @@
 #include "struct.h"
 
+//creates the fileList structure
 fList* createFList(fList* listHead, fList* listTail, char* basePath, char* dir){
+    if(checkDuplicateFile(listHead, basePath) == 0) return listHead;
     fList *n = malloc (sizeof(fList));
     n->path = basePath;
     n->directory = dir;
@@ -11,12 +13,14 @@ fList* createFList(fList* listHead, fList* listTail, char* basePath, char* dir){
     return listHead;
 }
 
+//sorts alphabetically the fileList structure
 fList* sortfList(fList *listHead, fList *listTail, fList *n){
 
-    if(listHead == NULL || strcmp(n->path, listHead->path) < 0){ //sorting alphabetically and creating the structure
+    //If the head is null (means that we are inserting the first element) or the current path ASCII value is greater than the head's one.
+    if(listHead == NULL || strcmp(n->path, listHead->path) < 0){ 
             n->next = listHead;
             listHead = n;
-    } else {
+    } else { //not the first element and lower ASCII value
         listTail = listHead;
         while((listTail->next != NULL) && (strcmp(n->path, listTail->next->path) >= 0)){
             listTail = listTail->next;
@@ -28,12 +32,14 @@ fList* sortfList(fList *listHead, fList *listTail, fList *n){
     return listHead;
 }
 
+//sorts alphabetically the lineList structure
 llist * sortllist(llist *lHead, llist *lTail, llist *l){
 
+    //If the head is null (means that we are inserting the first element) or the current path ASCII value is greater than the head's one.
     if(lHead == NULL || strcmp(l->line, lHead->line) < 0){   
         l->next = lHead;
         lHead = l;
-    } else {
+    } else { //not the first element and lower ASCII value
         lTail = lHead;
         while((lTail->next != NULL) && (strcmp(l->line, lTail->next->line) >= 0)){
             lTail = lTail->next;
@@ -45,6 +51,32 @@ llist * sortllist(llist *lHead, llist *lTail, llist *l){
     return lHead;
 }
 
+int checkDuplicateFile(fList *listHead, const char *line){
+    fList *app = listHead;
+
+    while(listHead != NULL){
+        if(strcmp(listHead->path, line) == 0) return 0; //we found a duplicate
+        listHead = listHead->next;
+    }
+
+    listHead = app;
+    return 1; //no duplicate
+}
+
+//returns 0 if there are duplicate paths, otherwise 1
+int checkDuplicatePath(llist *lHead, const char *line){
+    llist *app = lHead;
+
+    while(lHead != NULL){
+        if(strcmp(lHead->line, line) == 0) return 0; //we found a duplicate
+        lHead = lHead->next;
+    }
+
+    lHead = app;
+    return 1; //no duplicate
+}
+
+//creates the lineList structure
 llist * createllist(llist *lHead, llist *lTail, const char *inputFile){
     FILE * fInput;
     char *line = NULL;
@@ -59,8 +91,8 @@ llist * createllist(llist *lHead, llist *lTail, const char *inputFile){
     }
     
     while((line_size = getline(&line, &len, fInput)) != -1){
-        trimTrailing(line); 
-
+        trimTrailing(line); //deletes all the blank spaces in the line
+        if(checkDuplicatePath(lHead, line) == 0) continue; //if the path is a duplicated, pass to the next line
         //saving into the lineList structure
         llist *l = malloc (sizeof(llist)); 
         l->line = (char*)malloc((strlen(line)+1)*sizeof(char));
@@ -75,11 +107,14 @@ llist * createllist(llist *lHead, llist *lTail, const char *inputFile){
     return lHead;
 }
 
+//sorts the fileWord structure
 fWord * sortfWord(fWord *wordHead, fWord *wordTail, fWord *app){
+
+    //If the head is null (means that we are inserting the first element) or the current path ASCII value is greater than the head's one.
     if(wordHead == NULL || strcmp(app->word, wordHead->word) < 0){
         app->next = wordHead;
         wordHead = app;
-    } else {
+    } else { //not the first element and lower ASCII value
         wordTail = wordHead;
         while((wordTail->next != NULL) && (strcmp(app->word, wordTail->next->word) >= 0)){
             wordTail = wordTail->next;
@@ -91,6 +126,20 @@ fWord * sortfWord(fWord *wordHead, fWord *wordTail, fWord *app){
     return wordHead;
 }
 
+//returns 0 if there are duplicate words, otherwise 1
+int checkDuplicateWord(fWord *wordHead, const char *line){
+    fWord *app = wordHead;
+
+    while(wordHead != NULL){
+        if(strcmp(wordHead->word, line) == 0) return 0;
+        wordHead = wordHead->next;
+    }
+
+    wordHead = app;
+    return 1;
+}
+
+//creates the fileWord structure
 fWord * createfWord(fWord *wordHead, fWord *wordTail, const char *wordFile){
     FILE * fw;
     char *line = NULL;
@@ -105,7 +154,8 @@ fWord * createfWord(fWord *wordHead, fWord *wordTail, const char *wordFile){
     }
 
     while((line_size = getline(&line, &len, fw)) != -1){
-        trimTrailing(line); 
+        trimTrailing(line); //deletes all the blank spaces in the line
+        if(checkDuplicateWord(wordHead, line) == 0) continue; //if the word is duplicated, pass to the next
         fWord *app = malloc(sizeof(fWord));
         app->word = (char*)malloc((strlen(line)+1)*sizeof(char));
         strcpy(app->word, line);
@@ -121,7 +171,26 @@ fWord * createfWord(fWord *wordHead, fWord *wordTail, const char *wordFile){
     return wordHead;
 }
 
-void trimTrailing(char * str){ //delete blank spaces after a given string
+//creates the filePath structure
+fPath * createfPath(fPath **app, fPath **pathHead, fPath **pathTail, char *path, char *directory){
+    fPath *p = malloc(sizeof(fPath));
+    p->fileOccurrences = 0;
+    p->path = path;
+    p->directory = directory;
+    p->next = NULL;
+
+    *app = p;
+    if(*pathHead == NULL){
+        *pathTail = *pathHead = *app;
+    }else{
+        *pathTail = (*pathTail)->next = *app;
+    }
+
+    return *pathHead;
+}
+
+//deletes blank spaces after a given string
+void trimTrailing(char * str){ 
     int index, i;
 
     /* Set default index */

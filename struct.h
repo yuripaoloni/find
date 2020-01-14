@@ -1,3 +1,7 @@
+
+#ifndef STRUCT_H
+
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<sys/types.h>
@@ -54,4 +58,14 @@ fWord * createfWord(fWord *wordHead, fWord *wordTail, const char *wordFile);
 
 fWord * sortfWord(fWord *wordHead, fWord *wordTail, fWord *app);
 
+fPath * createfPath(fPath **app, fPath **pathHead, fPath **pathTail, char *path, char *directory);
+
 void trimTrailing(char * str);
+
+int checkDuplicatePath(llist *lHead, const char *line);
+
+int checkDuplicateWord(fWord *wordHead, const char *line);
+
+int checkDuplicateFile(fList *listHead, const char *line);
+
+#endif // !STRUCT_H
