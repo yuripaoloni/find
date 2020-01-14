@@ -6,10 +6,8 @@ fPosition *current = NULL;
 // Function to implement KMP algorithm
 int KMP(const char* X, const char* Y, int m, int n, int line, fPath *app){
 
-	int count = 0;
-
-	// next[i] stores the index of next best partial match
-	int next[n + 1];
+	int count = 0;	
+	int next[n + 1]; // next[i] stores the index of next best partial match
 
 	for (int i = 0; i < n + 1; i++)
 		next[i] = 0;
@@ -27,7 +25,9 @@ int KMP(const char* X, const char* Y, int m, int n, int line, fPath *app){
 	for (int i = 0, j = 0; i < m; i++){
 		if(X[i] == Y[j]){
 			if (++j == n){
-				count = count + 1; //conta le occorrenze della parola nella riga in input	
+				count = count + 1; //counts the occurrences of the word in the input line
+
+				//adds a new node in the structure
 				fPosition *node = malloc (sizeof(fPosition));
         		node->line = line;
         		node->character = i - j + 1;
@@ -38,9 +38,7 @@ int KMP(const char* X, const char* Y, int m, int n, int line, fPath *app){
         		}else{
             		current = current->next = node;
         		}
-
 				app->position = current;
-
 			}
 		}
 		else if (j > 0) {
@@ -49,16 +47,18 @@ int KMP(const char* X, const char* Y, int m, int n, int line, fPath *app){
 		}
 	}
 
-	return count;
+	return count; //returns the number of occurrences
 }
 
-fPosition * getHead(){ //rimette il puntatore alla testa della lista
+//pointer back to the head of list
+fPosition * getHead(){ 
 	fPosition *app = head;
-	head = NULL;
+	head = NULL; 
 	return app;
 }
 
-void freeKMP(){
+//free the memory allocated 
+void freeKMP(){ 
 	free(head);
 	free(current);
 }

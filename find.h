@@ -1,8 +1,13 @@
+#ifndef FIND_H
+
 #include<time.h>
 #include<dirent.h>
 #include<sys/stat.h>
 #include<unistd.h>
+#include "test.h"
 #include "kmp.h"
+
+void printHelp();
 
 void argumentsCheck(const char *args, const char *message);
 
@@ -20,10 +25,20 @@ void getWordOccurences(const char *word, const char *file, const char *fileToChe
 
 void freeMemory();
 
-char *get_filename_ext(const char *filename);
+char *getFilenameExt(const char *filename);
 
-int is_regular_file(const char *path);
+int isRegularFile(const char *path);
 
 void listFilesRecursively(char *path, const char *recursive, const int a, const char *exclude);
 
 void executeKMP(fWord *w, FILE *fp);
+
+int analyzeOutputFile(char **currentWord, char **currentFile, char **p, char **line);
+
+char *getDirectory(const char *basePath);
+
+void startTime(char **appDir, fList *list);
+
+void elapsedTime(char **appDir, fList *list);
+
+#endif // !FIND_H
