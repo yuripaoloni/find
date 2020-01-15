@@ -3,7 +3,11 @@
 The find application allows you to identify the number of occurrences of a set of strings within a group of files. To determine the number of occurrences (and their position) the Knuth-Morris and Pratt algorithm is used. At each execution, the application will output the list of files analyzed with the occurrences of the string in the text together with information regarding its position. The same information produced in output can be saved on an external file.
 The find application can be used both to generate analysis reports and to extract information from reports generated in previous executions.
 
-### Report
+## Build
+
+The CMake file is provided in the ```build``` folder.
+
+## Program report
 
 For each word the report will contain the following information:
 
@@ -23,7 +27,7 @@ OCCURRENCES <total_occurrences_filek>\r\n
 <linem> <charm>\r\n 
 ```
 
-### Use and features
+## Use and features
 
 To generate a new report, indicate the words to be searched and the directories or files to be searched. The files and directories to be analyzed will be listed in a file, to be passed as input to the program, with the following structure:
 
@@ -72,15 +76,15 @@ Finally, to view the analysis process you can add the parameter:
 
 In this case, for each file (or directory) analyzed, it will be necessary to print messages indicating the beginning of the processing, the term and the time required for the analysis.
 
-#### report analysis
+### Report analysis
 
-Once the report file is generated, the *find* program can be used to retrieve the saved information. We could:mmo:
+Once the report file is generated, the *find* program can be used to retrieve the saved information. We could:
 
 
 Print the list of files where at least ```<n>``` times the word ```<word>``` occurs:
 
 ```
-fine --report|-r <reportfile> --show <word> <n>
+find --report|-r <reportfile> --show <word> <n>
 ```
 
 If ```<n>``` is omitted, the value *1* is used.
@@ -88,13 +92,33 @@ If ```<n>``` is omitted, the value *1* is used.
 Print all the positions where the word ```<word>``` occurs in the file ```<file>```:
 
 ```
-fine --report|-r <reportfile> --show <word> --file <file>
+find --report|-r <reportfile> --show <word> --file <file>
 
 ```
 
 If ```<word>``` is not needed in ```<file>```, a suitable message is printed on the screen.
 
-## Authors
+Anyway, the list of command is viewed with:
+
+```
+find --help
+```
+or simply:
+
+```
+find
+```
+
+## Test
+
+All the tests are located into the ```test.c``` and ```test.h``` files. The tests used the text file provided by the ```test``` folder.
+To launch the test :
+
+```
+find --test
+```
+
+## Author
 
 * **Yuri Paoloni** - [yuripaoloni](https://github.com/yuripaoloni)
 
