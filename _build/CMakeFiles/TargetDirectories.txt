@@ -1,0 +1,3 @@
+/home/yuripaoloni/Scrivania/find/_build/CMakeFiles/rebuild_cache.dir
+/home/yuripaoloni/Scrivania/find/_build/CMakeFiles/find.dir
+/home/yuripaoloni/Scrivania/find/_build/CMakeFiles/edit_cache.dir

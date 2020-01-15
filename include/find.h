@@ -1,11 +1,12 @@
 #ifndef FIND_H
+#define FIND_H
 
 #include<time.h>
 #include<dirent.h>
 #include<sys/stat.h>
 #include<unistd.h>
-#include "test.h"
-#include "kmp.h"
+#include "../include/test.h"
+#include "../include/kmp.h"
 
 void printHelp();
 

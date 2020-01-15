@@ -1,10 +1,11 @@
 
 #ifndef KMP_H
+#define KMP_H
 
 
 #include<stdio.h>
 #include<stdlib.h>
-#include "struct.h"
+#include "../include/struct.h"
 
 fPosition * getHead();
 

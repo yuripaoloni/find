@@ -1,4 +1,4 @@
-#include "find.h"
+#include "../include/find.h"
 
 void runTest(){
 
@@ -31,6 +31,8 @@ void runTest(){
     testGetFilenameExt();
     printf("\n-----------------------------------------------------------------------------------------------------------------------------------------------\n");
     testIsRegularFile();
+    printf("\n-----------------------------------------------------------------------------------------------------------------------------------------------\n");
+    testSwapfPath();
     printf("\n-----------------------------------------------------------------------------------------------------------------------------------------------\n");
     testArgumentsCheck(); //contains exit(1) must be executed in the end
     printf("\n-----------------------------------------------------------------------------------------------------------------------------------------------\n");
@@ -200,4 +202,30 @@ void testIsRegularFile(){
     }else{
         printf("Not a regular file");
     }
+}
+
+void testSwapfPath(){
+    printf("\nTesting the function swapfPath() :\n\n");
+    fPath *a = malloc(sizeof(fPath));
+    a->directory = "test/A/testDir";
+    a->path = "testFileA";
+    a->fileOccurrences = 10;
+    a->next = NULL;
+    a->position = NULL;
+    fPath *b = malloc(sizeof(fPath));
+    b->directory = "test/B/testDir";
+    b->path = "testFileB";
+    b->fileOccurrences = 20;
+    b->next = NULL;
+    b->position = NULL;
+    printf("Before swap:\n");
+    printf("A dir : %s\t\tB dir : %s\n", a->directory, b->directory);
+    printf("A path : %s\t\tB path : %s\n", a->path, b->path);
+    printf("A occurrences : %d\t\tB occurrences : %d\n\n", a->fileOccurrences, b->fileOccurrences);
+    swapfPath(a, b);
+    printf("After swap:\n");
+    printf("A dir : %s\t\tB dir : %s\n", a->directory, b->directory);
+    printf("A path : %s\t\tB path : %s\n", a->path, b->path);
+    printf("A occurrences : %d\t\tB occurrences : %d\n\n", a->fileOccurrences, b->fileOccurrences);
+
 }

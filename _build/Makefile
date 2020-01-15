@@ -51,7 +51,7 @@ EQUALS = =
 CMAKE_SOURCE_DIR = /home/yuripaoloni/Scrivania/find
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/yuripaoloni/Scrivania/find/build
+CMAKE_BINARY_DIR = /home/yuripaoloni/Scrivania/find/_build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/yuripaoloni/Scrivania/find/build/CMakeFiles /home/yuripaoloni/Scrivania/find/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/yuripaoloni/Scrivania/find/_build/CMakeFiles /home/yuripaoloni/Scrivania/find/_build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/yuripaoloni/Scrivania/find/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/yuripaoloni/Scrivania/find/_build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -123,113 +123,113 @@ find/fast:
 	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/build
 .PHONY : find/fast
 
-find.o: find.c.o
+src/find.o: src/find.c.o
 
-.PHONY : find.o
-
-# target to build an object file
-find.c.o:
-	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/find.c.o
-.PHONY : find.c.o
-
-find.i: find.c.i
-
-.PHONY : find.i
-
-# target to preprocess a source file
-find.c.i:
-	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/find.c.i
-.PHONY : find.c.i
-
-find.s: find.c.s
-
-.PHONY : find.s
-
-# target to generate assembly for a file
-find.c.s:
-	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/find.c.s
-.PHONY : find.c.s
-
-kmp.o: kmp.c.o
-
-.PHONY : kmp.o
+.PHONY : src/find.o
 
 # target to build an object file
-kmp.c.o:
-	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/kmp.c.o
-.PHONY : kmp.c.o
+src/find.c.o:
+	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/src/find.c.o
+.PHONY : src/find.c.o
 
-kmp.i: kmp.c.i
+src/find.i: src/find.c.i
 
-.PHONY : kmp.i
+.PHONY : src/find.i
 
 # target to preprocess a source file
-kmp.c.i:
-	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/kmp.c.i
-.PHONY : kmp.c.i
+src/find.c.i:
+	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/src/find.c.i
+.PHONY : src/find.c.i
 
-kmp.s: kmp.c.s
+src/find.s: src/find.c.s
 
-.PHONY : kmp.s
+.PHONY : src/find.s
 
 # target to generate assembly for a file
-kmp.c.s:
-	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/kmp.c.s
-.PHONY : kmp.c.s
+src/find.c.s:
+	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/src/find.c.s
+.PHONY : src/find.c.s
 
-struct.o: struct.c.o
+src/kmp.o: src/kmp.c.o
 
-.PHONY : struct.o
+.PHONY : src/kmp.o
 
 # target to build an object file
-struct.c.o:
-	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/struct.c.o
-.PHONY : struct.c.o
+src/kmp.c.o:
+	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/src/kmp.c.o
+.PHONY : src/kmp.c.o
 
-struct.i: struct.c.i
+src/kmp.i: src/kmp.c.i
 
-.PHONY : struct.i
+.PHONY : src/kmp.i
 
 # target to preprocess a source file
-struct.c.i:
-	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/struct.c.i
-.PHONY : struct.c.i
+src/kmp.c.i:
+	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/src/kmp.c.i
+.PHONY : src/kmp.c.i
 
-struct.s: struct.c.s
+src/kmp.s: src/kmp.c.s
 
-.PHONY : struct.s
+.PHONY : src/kmp.s
 
 # target to generate assembly for a file
-struct.c.s:
-	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/struct.c.s
-.PHONY : struct.c.s
+src/kmp.c.s:
+	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/src/kmp.c.s
+.PHONY : src/kmp.c.s
 
-test.o: test.c.o
+src/struct.o: src/struct.c.o
 
-.PHONY : test.o
+.PHONY : src/struct.o
 
 # target to build an object file
-test.c.o:
-	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/test.c.o
-.PHONY : test.c.o
+src/struct.c.o:
+	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/src/struct.c.o
+.PHONY : src/struct.c.o
 
-test.i: test.c.i
+src/struct.i: src/struct.c.i
 
-.PHONY : test.i
+.PHONY : src/struct.i
 
 # target to preprocess a source file
-test.c.i:
-	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/test.c.i
-.PHONY : test.c.i
+src/struct.c.i:
+	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/src/struct.c.i
+.PHONY : src/struct.c.i
 
-test.s: test.c.s
+src/struct.s: src/struct.c.s
 
-.PHONY : test.s
+.PHONY : src/struct.s
 
 # target to generate assembly for a file
-test.c.s:
-	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/test.c.s
-.PHONY : test.c.s
+src/struct.c.s:
+	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/src/struct.c.s
+.PHONY : src/struct.c.s
+
+src/test.o: src/test.c.o
+
+.PHONY : src/test.o
+
+# target to build an object file
+src/test.c.o:
+	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/src/test.c.o
+.PHONY : src/test.c.o
+
+src/test.i: src/test.c.i
+
+.PHONY : src/test.i
+
+# target to preprocess a source file
+src/test.c.i:
+	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/src/test.c.i
+.PHONY : src/test.c.i
+
+src/test.s: src/test.c.s
+
+.PHONY : src/test.s
+
+# target to generate assembly for a file
+src/test.c.s:
+	$(MAKE) -f CMakeFiles/find.dir/build.make CMakeFiles/find.dir/src/test.c.s
+.PHONY : src/test.c.s
 
 # Help Target
 help:
@@ -240,18 +240,18 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... find"
 	@echo "... edit_cache"
-	@echo "... find.o"
-	@echo "... find.i"
-	@echo "... find.s"
-	@echo "... kmp.o"
-	@echo "... kmp.i"
-	@echo "... kmp.s"
-	@echo "... struct.o"
-	@echo "... struct.i"
-	@echo "... struct.s"
-	@echo "... test.o"
-	@echo "... test.i"
-	@echo "... test.s"
+	@echo "... src/find.o"
+	@echo "... src/find.i"
+	@echo "... src/find.s"
+	@echo "... src/kmp.o"
+	@echo "... src/kmp.i"
+	@echo "... src/kmp.s"
+	@echo "... src/struct.o"
+	@echo "... src/struct.i"
+	@echo "... src/struct.s"
+	@echo "... src/test.o"
+	@echo "... src/test.i"
+	@echo "... src/test.s"
 .PHONY : help
 
 

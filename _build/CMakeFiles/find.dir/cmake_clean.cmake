@@ -1,8 +1,8 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/find.dir/find.c.o"
-  "CMakeFiles/find.dir/kmp.c.o"
-  "CMakeFiles/find.dir/struct.c.o"
-  "CMakeFiles/find.dir/test.c.o"
+  "CMakeFiles/find.dir/src/find.c.o"
+  "CMakeFiles/find.dir/src/kmp.c.o"
+  "CMakeFiles/find.dir/src/struct.c.o"
+  "CMakeFiles/find.dir/src/test.c.o"
   "find.pdb"
   "find"
 )

@@ -1,4 +1,4 @@
-#include "find.h"
+#include "../include/find.h"
 
 //macros used during output file analyzing 
 #define WORD_STR "WORD"
@@ -230,11 +230,13 @@ void execute(const char *wordFile, const char *inputFile, const char *excluded, 
 
             if(verboseFlag == 1) elapsedTime(&appDir, list);
             
+
             list = list->next;
             fclose(fp);
         }
         if(verboseFlag == 1) printf("Terminate processing word: %s\n", w->word);
         w->p = pathHead;
+        sortFileByOccurrences(pathHead); 
         list = listHead;
         w = w->next;
         pathHead = NULL;

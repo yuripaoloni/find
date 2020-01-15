@@ -1,4 +1,44 @@
-#include "struct.h"
+#include "../include/struct.h"
+
+//sorts the list of file in descending order by file occurrences
+void sortFileByOccurrences(fPath *head){
+    int swapped;
+    fPath *ptr1;
+    fPath *lptr = NULL;
+
+    //checking for empty list
+    if(head == NULL) return;
+
+    do{
+        swapped = 0;
+        ptr1 = head;
+
+        while(ptr1->next != lptr){
+            if(ptr1->fileOccurrences > ptr1->next->fileOccurrences){
+                swapfPath(ptr1, ptr1->next);
+                swapped = 1;
+            }
+            ptr1 = ptr1->next;
+        }
+        lptr = ptr1;
+    }while(swapped);
+}
+
+//swaps the data of the fPath element
+void swapfPath(fPath *a, fPath *b){
+    char *dir = a->directory;
+    char *path = a->path; 
+    int fileOccur = a->fileOccurrences;
+    fPosition *p = a->position;
+    a->directory = b->directory;
+    a->path = b->path;
+    a->fileOccurrences = b->fileOccurrences;
+    a->position = b->position;
+    b->directory = dir;
+    b->path = path;
+    b->fileOccurrences = fileOccur;
+    b->position = p;
+}
 
 //creates the fileList structure
 fList* createFList(fList* listHead, fList* listTail, char* basePath, char* dir){
@@ -51,6 +91,7 @@ llist * sortllist(llist *lHead, llist *lTail, llist *l){
     return lHead;
 }
 
+//discards the duplicate in the list of file
 int checkDuplicateFile(fList *listHead, const char *line){
     fList *app = listHead;
 

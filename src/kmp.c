@@ -1,4 +1,4 @@
-#include "kmp.h"
+#include "../include/kmp.h"
 
 fPosition *head = NULL;
 fPosition *current = NULL;

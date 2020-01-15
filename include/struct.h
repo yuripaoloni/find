@@ -1,6 +1,5 @@
-
 #ifndef STRUCT_H
-
+#define STRUCT_H
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -67,5 +66,9 @@ int checkDuplicatePath(llist *lHead, const char *line);
 int checkDuplicateWord(fWord *wordHead, const char *line);
 
 int checkDuplicateFile(fList *listHead, const char *line);
+
+void sortFileByOccurrences(fPath *head);
+
+void swapfPath(fPath *a, fPath *b);
 
 #endif // !STRUCT_H
