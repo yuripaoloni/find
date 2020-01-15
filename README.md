@@ -5,7 +5,7 @@ The find application can be used both to generate analysis reports and to extrac
 
 ## Build
 
-The CMake file is provided in the ```build``` folder.
+The CMake file is provided in the ```_build``` folder.
 
 ## Program report
 
