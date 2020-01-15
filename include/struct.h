@@ -6,12 +6,15 @@
 #include<sys/types.h>
 #include<string.h>
 
+//stores all the path to analyze during the execution of KMP algorithm, 
+//this paths can be obtained from the recursive read of a folder given in input by the user.
 struct fileList{
     char *path;
     char *directory;
     struct fileList *next;
 };
 
+//stores all the files where the program searched and the word occurrences founded in them.
 struct filePath{
     char *path;
     char *directory;
@@ -20,11 +23,13 @@ struct filePath{
     struct filePath *next;
 };
 
-struct lineList{ //structure with all the line of the input file
+//struct with all the line of the input file
+struct lineList{ 
     char *line;
     struct lineList *next;
 };
 
+//stores all the words to search and all the data retrieved from the analysis of the list of file.
 struct fileWord{
 	char *word;
 	int totalOccurences;
@@ -32,6 +37,7 @@ struct fileWord{
     struct fileWord *next;
 };
 
+//stores the position of each occurrences founded in a file.
 struct OccurrencesPosition{
     int line;
     int character;
