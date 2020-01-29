@@ -14,7 +14,7 @@ void sortFileByOccurrences(fPath *head){
         ptr1 = head;
 
         while(ptr1->next != lptr){
-            if(ptr1->fileOccurrences > ptr1->next->fileOccurrences){
+            if(ptr1->fileOccurrences < ptr1->next->fileOccurrences){
                 swapfPath(ptr1, ptr1->next);
                 swapped = 1;
             }

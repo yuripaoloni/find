@@ -444,7 +444,7 @@ void print(fWord *w, fWord *wordHead, fPath *pathHead){
 
     w = wordHead;
 
-    printf("\n"); //il file termina con una riga vuota
+    printf("\n"); //the file ends with a blank line
 }
 
 //prints on a file the report returned from the "execute()" function.

@@ -1,1 +1,0 @@
-/usr/bin/cc   -rdynamic CMakeFiles/find.dir/src/find.c.o CMakeFiles/find.dir/src/kmp.c.o CMakeFiles/find.dir/src/struct.c.o CMakeFiles/find.dir/src/test.c.o  -o find 

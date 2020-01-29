@@ -96,10 +96,13 @@ void testCreateFlist(){
     head = createFList(head, tail, "./test/testDir/testFile4", "./test/testDir");
     head = createFList(head, tail, "./test/testDir/testFile5.txt", "./test/testDir");
 
+    fList *temp;
     while(head != NULL){
         printf("path : %s\n", head->path);
         printf("directory : %s\n", head->directory);
+        temp = head;
         head = head->next;
+        free(temp);
     }
 
 }
@@ -110,9 +113,12 @@ void testCreateLlist(){
     llist *tail = NULL;
     head = createllist(head, tail, "./test/testInputPath");
 
+    llist *temp;
     while(head != NULL){
         printf("line : %s\n", head->line);
+        temp = head;
         head = head->next;
+        free(temp);
     }
 }
 
@@ -122,9 +128,12 @@ void testCreateFword(){
     fWord *tail = NULL;
     head = createfWord(head, tail, "./test/testInputWord");
 
+    fWord *temp;
     while(head != NULL){
         printf("word: %s\n", head->word);
+        temp = head;
         head = head->next;
+        free(temp);
     }
 }
 
@@ -146,11 +155,14 @@ void testCreateFpath(){
         fHead = createfPath(&app, &fHead, &fTail, head->path, head->directory);
         head = head->next;
     }
+    fPath *temp;
     while(fHead != NULL){
         printf("path: %s\n", fHead->path);
         printf("directory: %s\n", fHead->directory);
         printf("occurrences: %d\n", fHead->fileOccurrences);
+        temp = fHead;
         fHead = fHead->next;
+        free(temp);
     }
 }
 
@@ -172,10 +184,14 @@ void testElapsedTime(){
     head = createFList(head, tail, "./test/testDir/testFile1", "./test/testDir");
     head = createFList(head, tail, "./test/testDir/testFile4", "./test/testDir");
     head = createFList(head, tail, "./test/testDir/testFile5.txt", "./test/testDir");
+
+    fList *temp;
     while(head != NULL){
         startTime(&head->directory, head);
         elapsedTime(&head->directory, head);
+        temp = head;
         head = head->next;
+        free(temp);
     }
 }
 
@@ -227,5 +243,6 @@ void testSwapfPath(){
     printf("A dir : %s\t\tB dir : %s\n", a->directory, b->directory);
     printf("A path : %s\t\tB path : %s\n", a->path, b->path);
     printf("A occurrences : %d\t\tB occurrences : %d\n\n", a->fileOccurrences, b->fileOccurrences);
-
+    free(a);
+    free(b);
 }
